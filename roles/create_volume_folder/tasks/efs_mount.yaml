@@ -1,0 +1,29 @@
+---
+- name: "Mount {{ efs_hostname }} on {{ nfs_mount_directory }}"
+  ansible.posix.mount:
+    src: "{{ efs_hostname }}:/"
+    path: "{{ nfs_mount_directory }}"
+    boot: false
+    opts: "rw,sync,nfsvers=4.1,rsize=1048576,wsize=1048576,timeo=900,retrans=2,noresvport,intr,soft"
+    # opts: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport"
+    state: "{{ mount_action }}"
+    fstype: nfs
+  become: true
+  retries: 3
+  delay: 10
+  when: "'mounted' == mount_action or 'ephemeral' == mount_action"
+
+- name: "Unmount {{ efs_hostname }} on {{ nfs_mount_directory }}"
+  ansible.posix.mount:
+    src: "{{ efs_hostname }}:/"
+    path: "{{ nfs_mount_directory }}"
+    state: "{{ item }}"
+  become: true
+  retries: 3
+  delay: 10
+  with_items:
+    - unmounted
+    - absent
+  when: "'absent' == mount_action or 'unmounted' == mount_action"
+  failed_when: false
+  

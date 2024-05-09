@@ -1,0 +1,24 @@
+---
+- name: "Generate the PersistentVolume and PersistentVolumeClaim manifest"
+  block:
+
+    - name: "Gen PV: Set PersistentVolume name fact"
+      ansible.builtin.set_fact:
+        __pv_name: "{{ business_unit }}.{{ application_name }}.{{ namespace }}.{{ pvc_name }}"
+
+    - name: "Gen PV: Create the PV/PVC directories for SCM"
+      ansible.builtin.file:
+        path: "{{ dir_name | normpath }}"
+        state: directory
+        recurse: true
+        mode: "{{ default_file_permissions }}"
+      loop:
+        - "{{ pv_git_volume_directory }}"
+      loop_control:
+        loop_var: dir_name
+
+    - name: "Gen PV: Process the volumes template and save to manifests directory"
+      ansible.builtin.template:
+        src: "templates/pv-pvc.yaml.j2"
+        dest: "{{ pv_git_volume_manifest_name }}"
+        mode: "{{ default_file_permissions }}"

@@ -1,0 +1,6 @@
+business_unit: "" # get-from-env
+application_name: "" # get-from-env
+namespace: "" # get-from-env
+pvc_name: "" # get-from-env
+pv_enable_multi_mount: true # get-from-env
+pvc_size: 0 # get-from-env

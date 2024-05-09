@@ -1,0 +1,221 @@
+{
+  "attempts": 6,
+  "changed": false,
+  "result": {
+    "results": [
+      {
+        "changed": false,
+        "method": "update",
+        "result": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolume",
+          "metadata": {
+            "annotations": {
+              "pv.kubernetes.io/bound-by-controller": "yes"
+            },
+            "creationTimestamp": "2024-04-24T22:47:40Z",
+            "finalizers": [
+              "kubernetes.io/pv-protection"
+            ],
+            "managedFields": [
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:spec": {
+                    "f:accessModes": {},
+                    "f:capacity": {
+                      ".": {},
+                      "f:storage": {}
+                    },
+                    "f:mountOptions": {},
+                    "f:nfs": {
+                      ".": {},
+                      "f:path": {},
+                      "f:server": {}
+                    },
+                    "f:persistentVolumeReclaimPolicy": {},
+                    "f:volumeMode": {}
+                  }
+                },
+                "manager": "OpenAPI-Generator",
+                "operation": "Update",
+                "time": "2024-04-24T22:47:40Z"
+              },
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:metadata": {
+                    "f:annotations": {
+                      ".": {},
+                      "f:pv.kubernetes.io/bound-by-controller": {}
+                    }
+                  },
+                  "f:spec": {
+                    "f:claimRef": {
+                      ".": {},
+                      "f:apiVersion": {},
+                      "f:kind": {},
+                      "f:name": {},
+                      "f:namespace": {},
+                      "f:resourceVersion": {},
+                      "f:uid": {}
+                    }
+                  }
+                },
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "time": "2024-04-24T22:50:58Z"
+              },
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:status": {
+                    "f:phase": {}
+                  }
+                },
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": "2024-04-24T22:50:58Z"
+              }
+            ],
+            "name": "sales.e-shopping.shopping-dev2.shopping-dev2",
+            "resourceVersion": "1934721",
+            "uid": "92122bd0-f248-4a59-a419-ae2b63c2f2fd"
+          },
+          "spec": {
+            "accessModes": [
+              "ReadWriteMany"
+            ],
+            "capacity": {
+              "storage": "10Gi"
+            },
+            "claimRef": {
+              "apiVersion": "v1",
+              "kind": "PersistentVolumeClaim",
+              "name": "shopping-dev2",
+              "namespace": "shopping-dev2",
+              "resourceVersion": "1934718",
+              "uid": "6758eb48-1ff9-4045-b500-09ac5d5d0821"
+            },
+            "mountOptions": [
+              "hard",
+              "nfsvers=4.1"
+            ],
+            "nfs": {
+              "path": "/k8s-static-volumes/sales/e-shopping/shopping-dev2",
+              "server": "fs-00e3a9740f49d6c95.efs.us-east-1.amazonaws.com"
+            },
+            "persistentVolumeReclaimPolicy": "Recycle",
+            "volumeMode": "Filesystem"
+          },
+          "status": {
+            "phase": "Bound"
+          }
+        }
+      },
+      {
+        "changed": false,
+        "method": "update",
+        "result": {
+          "apiVersion": "v1",
+          "kind": "PersistentVolumeClaim",
+          "metadata": {
+            "annotations": {
+              "pv.kubernetes.io/bind-completed": "yes"
+            },
+            "creationTimestamp": "2024-04-24T22:50:58Z",
+            "finalizers": [
+              "kubernetes.io/pvc-protection"
+            ],
+            "managedFields": [
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:spec": {
+                    "f:accessModes": {},
+                    "f:resources": {
+                      "f:requests": {
+                        ".": {},
+                        "f:storage": {}
+                      }
+                    },
+                    "f:storageClassName": {},
+                    "f:volumeMode": {},
+                    "f:volumeName": {}
+                  }
+                },
+                "manager": "OpenAPI-Generator",
+                "operation": "Update",
+                "time": "2024-04-24T22:50:58Z"
+              },
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:metadata": {
+                    "f:annotations": {
+                      ".": {},
+                      "f:pv.kubernetes.io/bind-completed": {}
+                    }
+                  }
+                },
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "time": "2024-04-24T22:51:03Z"
+              },
+              {
+                "apiVersion": "v1",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:status": {
+                    "f:accessModes": {},
+                    "f:capacity": {
+                      ".": {},
+                      "f:storage": {}
+                    },
+                    "f:phase": {}
+                  }
+                },
+                "manager": "kube-controller-manager",
+                "operation": "Update",
+                "subresource": "status",
+                "time": "2024-04-24T22:51:03Z"
+              }
+            ],
+            "name": "shopping-dev2",
+            "namespace": "shopping-dev2",
+            "resourceVersion": "1934769",
+            "uid": "6758eb48-1ff9-4045-b500-09ac5d5d0821"
+          },
+          "spec": {
+            "accessModes": [
+              "ReadWriteMany"
+            ],
+            "resources": {
+              "requests": {
+                "storage": "10Gi"
+              }
+            },
+            "storageClassName": "",
+            "volumeMode": "Filesystem",
+            "volumeName": "sales.e-shopping.shopping-dev2.shopping-dev2"
+          },
+          "status": {
+            "accessModes": [
+              "ReadWriteMany"
+            ],
+            "capacity": {
+              "storage": "10Gi"
+            },
+            "phase": "Bound"
+          }
+        }
+      }
+    ]
+  }
+}

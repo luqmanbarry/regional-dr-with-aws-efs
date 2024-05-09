@@ -1,0 +1,21 @@
+
+business_unit: sales
+aws_region: us-east-1
+micro_services:
+  - name: warehouse
+    namespace: warehouse-dev
+    pvc_name: warehouse-store
+    pvc_size: 200Gi
+    image: image-registry.openshift-image-registry.svc:5000/openshift/nginx
+
+  - name: point-of-sale
+    namespace: point-of-sale
+    pvc_name: point-of-sale
+    pvc_size: 100Gi
+    image: image-registry.openshift-image-registry.svc:5000/openshift/httpd
+
+  - name: shipping
+    namespace: shipping-dev
+    pvc_name: shipping-dev
+    pvc_size: 75Gi
+    image: image-registry.openshift-image-registry.svc:5000/openshift/nginx

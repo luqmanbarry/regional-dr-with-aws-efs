@@ -1,0 +1,87 @@
+---
+- name: "Update PV/PVC manifests from {{ pv_git_volume_root_directory }}/* and apply to new cluster"
+  block:
+    - name: "Update PV/PVC: Recursively read all PV/PVC manifests"
+      ansible.builtin.find:
+        paths: "{{ pv_git_volume_root_directory }}"
+        file_type: file
+        recurse: true
+        use_regex: true
+        patterns:
+          - '^{{ pv_manifest_file_prefix }}.*.yaml$'
+      register: pv_pvc_found_manifests
+
+    - name: "Update PV/PVC: Set __pv_primary_manifests_paths fact"
+      ansible.builtin.set_fact:
+        __pv_primary_manifests_paths: "{{ pv_pvc_found_manifests.files | map(attribute='path') | list }}" 
+
+    - name: "Update PV/PVC: Set __pv_secondary_manifests_paths fact"
+      ansible.builtin.set_fact:
+        __pv_secondary_manifests_paths: "{{ __pv_secondary_manifests_paths | default([]) | union([ item | replace('primary','secondary') ]) }}"
+      with_items: 
+        - "{{ __pv_primary_manifests_paths }}"
+
+    - name: "Update PV/PVC: Set __pv_secondary_pvc_namespaces_tmp fact"
+      ansible.builtin.set_fact:
+        __pv_secondary_pvc_namespaces_tmp: "{{ __pv_secondary_pvc_namespaces_tmp | default([]) | union([ item | normpath | dirname | split('/') | last ]) }}"
+      with_items: 
+        - "{{ __pv_secondary_manifests_paths }}"
+    
+    - name: "Update PV/PVC: Set __pv_secondary_pvc_namespaces fact"
+      ansible.builtin.set_fact:
+        __pv_secondary_pvc_namespaces: "{{ __pv_secondary_pvc_namespaces | default([]) | union([ item ]) | unique | select | list }}"
+      with_items: 
+        - "{{ __pv_secondary_pvc_namespaces_tmp }}"
+
+    - name: "Update PV/PVC: Create secondary PV/PVC manifests directory tree for SCM"
+      ansible.builtin.file:
+        path: "{{ item | dirname }}"
+        state: directory
+        recurse: true
+        mode: "{{ default_file_permissions }}"
+      with_items:
+        - "{{ __pv_secondary_manifests_paths }}" 
+
+
+    - name: "Update PV/PVC: Copy primary PVC/PVC manifests to their secondary counterparts"
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ item | replace('primary','secondary') }}"
+        mode: "{{ default_file_permissions }}"
+      with_items: 
+        - "{{ __pv_primary_manifests_paths }}"
+
+    - name: "Update PV/PVC: Update the secondary PV/PVC manifest nfs.server value"
+      ansible.builtin.replace:
+        path: "{{ item }}"
+        regexp: 'server: .+$'
+        replace: 'server: "{{ efs_hostname }}"'
+      with_items: 
+        - "{{ __pv_secondary_manifests_paths }}"
+
+    - name: "Update PV/PVC: Create PVC namespace if it does not exist"
+      kubernetes.core.k8s:
+        name: "{{ item }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      register: ns_result
+      retries: 6
+      delay: 10
+      with_items: 
+        - "{{ __pv_secondary_pvc_namespaces }}"
+
+    - name: "Update PV/PVC: Apply the PV & PVC manifests"
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ item }}"
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      register: pv_result
+      retries: 100
+      delay: 10
+      until: 
+        - pv_result.result.results[0].result.spec.claimRef is defined
+        - pv_result.result.results[0].result.spec.claimRef is search(pvc_name)
+      with_items: 
+        - "{{ __pv_secondary_manifests_paths }}"

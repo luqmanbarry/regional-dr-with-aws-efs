@@ -1,0 +1,59 @@
+---
+- name: "Stop EFS Replication and wait until destination EFS is writable"
+  block:
+    - name: "Stop Replication: Set facts"
+      ansible.builtin.set_fact:
+        dest_efs_write_test_file: "{{ dest_nfs_mount_directory }}/{{ efs_volumes_root_dir }}/failover-write.test"
+        src_efs_id: "{{ src_efs_hostname | split('.') | first }}"
+
+    - name: "Stop Replication: Stop EFS replication from '{{ src_efs_hostname }}' to '{{ dest_efs_hostname }}'"
+      ansible.builtin.shell: |
+        aws efs delete-replication-configuration --region "{{ primary_region }}" --source-file-system-id "{{ src_efs_id }}"
+      register: stop_replication
+      failed_when: false
+
+    - name: "Stop Replication: Print stop replication command output"
+      ansible.builtin.debug:
+        msg: "{{ stop_replication }}"
+
+    - name: "Stop Replication: Unmount destination EFS instance"
+      vars:
+        mount_action: "absent"
+      ansible.builtin.include_role:
+        name: "create_volume_folder"
+        tasks_from: "efs_mount"
+
+    - name: "Stop Replication: Mount destination EFS instance to verify it is writable"
+      vars:
+        mount_action: "ephemeral"
+        efs_hostname: "{{ dest_efs_hostname }}"
+      ansible.builtin.include_role:
+        name: "create_volume_folder"
+        tasks_from: "efs_mount"
+
+    - name: "Stop Replication: Write test to EFS Secondary"
+      ansible.builtin.lineinfile:
+        path: "{{ dest_efs_write_test_file }}" 
+        line: "EFS Secondary: Post replication write test"
+        create: true
+      become: true
+      register: write_test
+      retries: 100
+      delay: 10
+      until: write_test.failed == false
+
+    - name: "Stop Replication: Remove test file from EFS secondary"
+      ansible.builtin.file:
+        path: "{{ dest_efs_write_test_file }}"
+        state: absent
+      become: true
+
+  ignore_errors: false
+
+  always:
+    - name: "Stop Replication: Unmount destination EFS instance after write test"
+      vars:
+        mount_action: "absent"
+      ansible.builtin.include_role:
+        name: "create_volume_folder"
+        tasks_from: "efs_mount"

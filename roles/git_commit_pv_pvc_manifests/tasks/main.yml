@@ -1,0 +1,46 @@
+---
+- name: "Commit and push volumes to git"
+  block:
+
+    - name: "Git: Config"
+      ansible.builtin.set_fact:
+        git_remote_name: "pv-remote"
+        git_branch: "{{ pv_git_commit_branch }}"
+        git_remote_url: "https://{{ pv_git_commit_username }}:{{ pv_git_commit_token }}@{{ pv_git_commit_repository | replace('https://', '') | replace('http://', '') }}"
+
+    - name: "Git: Set remote git-url"
+      ansible.builtin.shell: |
+        git remote remove {{ git_remote_name }}
+        git remote add {{ git_remote_name }} {{ git_remote_url }}
+      args:
+        chdir: "{{ pv_git_commit_dir }}"
+
+    - name: "Git: Ensure nfs mount directories are ignored"
+      ansible.builtin.lineinfile:
+        line: "{{ ignore_item }}"
+        path: "{{ git_ignore_filename }}"
+        state: "present"
+        create: true
+      loop:
+        - "*/{{ nfs_mount_directory.split('/')[-1] }}"
+        - "{{ ansible_env_dir }}"
+        - "*.log"
+      loop_control:
+        loop_var: ignore_item
+
+    - name: "Git: Commit volume manifests to git repository"
+      ansible.builtin.shell: |
+        git fetch
+        git pull
+        git add -A
+        git commit -m "Volume manifests for application: '{{ business_unit }}/{{ application_name }}'"
+        git push {{ git_remote_name }} {{ git_branch }}
+      args:
+        chdir: "{{ pv_git_commit_dir }}"
+
+  always:
+    - name: "Git: Remove custom remote git-url"
+      ansible.builtin.shell: |
+        git remote remove {{ git_remote_name }}
+      args:
+        chdir: "{{ pv_git_commit_dir }}"

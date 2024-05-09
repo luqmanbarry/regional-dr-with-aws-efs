@@ -1,0 +1,129 @@
+---
+- name: "Apply PersistentVolume, PersistentVolumeClaim manifests"
+  block:
+    - name: "Apply PV/PVC: Set mount test path"
+      ansible.builtin.set_fact:
+        __mount_test_path: "/{{ pvc_name }}/mount-test"
+        __mount_test_pod_name: "{{ pvc_name }}-mount-test"
+        __mount_testPod_template: "templates/mount-test.yaml.j2"
+    - ansible.builtin.set_fact:
+        __local_mount_test_dir: "{{ __pv_local_volume_dir }}/{{ __mount_test_path }}"
+
+    - name: "Apply PV/PVC: Create namespace if it does not exist"
+      kubernetes.core.k8s:
+        name: "{{ namespace }}"
+        api_version: v1
+        kind: Namespace
+        state: present
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      register: ns_result
+      retries: 6
+      delay: 10
+      until: ns_result.result.status.phase == 'Active'
+
+    - name: "Apply PV/PVC: Delete (if exists) volume mount-test pods"
+      kubernetes.core.k8s:
+        state: absent
+        template: "{{ __mount_testPod_template }}"
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      failed_when: false
+
+    - name: "Apply PV/PVC: Apply the PV & PVC manifests"
+      kubernetes.core.k8s:
+        state: present
+        src: "{{ pv_git_volume_manifest_name }}"
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      register: pv_result
+      retries: 3
+      delay: 10
+      until: 
+        - pv_result.result.results[0].result.spec.claimRef is defined
+        - pv_result.result.results[0].result.spec.claimRef is search(pvc_name)
+
+    - name: "Apply PV/PVC: Deploy volume mount test applications"
+      kubernetes.core.k8s:
+        state: present
+        force: true
+        template: "{{ __mount_testPod_template }}"
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+      retries: 6
+      delay: 10
+
+    - name: "Apply PV/PVC: Wait for tests pods to be 'Ready'"
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        wait: yes
+        name: "{{ __mount_test_pod_name }}"
+        namespace: "{{ namespace }}"
+        wait_sleep: 10
+        wait_timeout: 360
+      register: deployment_result
+      retries: 6
+      delay: 10
+      until: deployment_result.resources[0].status.replicas == deployment_result.resources[0].status.readyReplicas
+
+    # - name: Fail conditionally
+    #   fail:
+    #     msg: "Pod Result: {{ pod_result.resources[0].status.phase }}"
+    #   when: true
+
+    - name: "Apply PV/PVC: Mount the EFS instance"
+      vars:
+        mount_action: "ephemeral"
+      ansible.builtin.include_role:
+        name: "create_volume_folder"
+        tasks_from: "efs_mount"
+
+    - name: "Apply PV/PVC: Check if mount-test pods were able to write to persistent volume directory"
+      ansible.builtin.shell: |
+        du -sh "{{ __local_mount_test_dir | normpath }}" | awk '{print $1}'
+      become: true
+      register: mount_dir_size
+      failed_when: mount_dir_size.stdout[:-2] | int  <= 0 or mount_dir_size.stdout[:-1] | int  <= 0
+
+    - name: "Apply PV/PVC: Print size of data written during mount tests"
+      ansible.builtin.debug:
+        msg: "Mount test write size: '{{ mount_dir_size.stdout }}'"
+
+    - name: "Apply PV/PVC: Delete (if exists) volume mount-test pods"
+      kubernetes.core.k8s:
+        state: absent
+        template: "{{ __mount_testPod_template }}"
+        kubeconfig: "{{ ocp_kubeconfig }}/config"
+    
+    - name: "Apply PV/PVC: Sleep for 90 seconds and continue"
+      ansible.builtin.wait_for:
+        timeout: 90
+
+    - name: "Apply PV/PVC: Get mount-test directory listing"
+      ansible.builtin.find:
+        path: "{{ __local_mount_test_dir }}" 
+        file_type: any
+        hidden: yes
+      become: true
+      register: directory_content_result
+
+    - name: "Apply PV/PVC: Remove mount-test directory content"
+      ansible.builtin.file:
+        path: "{{ item.path }}" 
+        state: absent
+      become: true
+      with_items: "{{ directory_content_result.files }}" 
+      loop_control:
+        label: "{{ item.path }}" 
+
+    - name: "Apply PV/PVC: Remove mount-test directory itself"
+      ansible.builtin.file:
+        path: "{{ __local_mount_test_dir }}" 
+        state: absent
+      become: true
+
+  ignore_errors: false
+  always:
+
+    - name: "Apply PV/PVC: Unmount EFS instance after mount test"
+      vars:
+        mount_action: "absent"
+      ansible.builtin.include_role:
+        name: "create_volume_folder"
+        tasks_from: "efs_mount"

@@ -1,0 +1,138 @@
+---
+- name: "Verify user inputs match required string length"
+  block:
+    - name: "Input Validation | Volume_dr_mode=CREATE only tasks"
+      block:
+        - name: "Input Validation: Assert 'business_unit' string size >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - business_unit | length >= 2
+              - business_unit | length <= 50
+            fail_msg: "'business_unit' str length must be between 2 and 253 characters"
+            success_msg: "'business_unit' str length value is '{{ business_unit | length }}'"
+
+        - name: "Input Validation: Assert 'application_name' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - application_name | length >= 2
+              - application_name | length <= 50
+            fail_msg: "'application_name' str length must be between 2 and 253 characters"
+            success_msg: "'application_name' str length value is '{{ application_name | length }}'"
+
+        - name: "Input Validation: Assert 'namespace' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - namespace | length >= 2
+              - namespace | length <= 50
+            fail_msg: "'namespace' str length must be between 2 and 253 characters"
+            success_msg: "'namespace' str length value is '{{ namespace | length }}'"
+
+        - name: "Input Validation: Assert 'pvc_name' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - pvc_name | length >= 2
+              - pvc_name | length <= 50
+            fail_msg: "'pvc_name' str length must be between 2 and 253 characters"
+            success_msg: "'pvc_name' str length value is '{{ pvc_name | length }}'"
+        
+        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC create"
+          ansible.builtin.set_fact:
+            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_create"
+        
+        - name: "Input Validation: Assert 'pvc_size' in Gi is > 0"
+          ansible.builtin.assert:
+            that:
+              - pvc_size | int > 0
+            fail_msg: "'pvc_size' must be greater than zero (0)"
+            success_msg: "'pvc_size' value is '{{ pvc_size }}'"
+
+      when: "'CREATE' in volume_dr_mode"
+
+
+    - name: "Input Validation | Volume_dr_mode=RESTORE only tasks"
+      block:
+        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC restore"
+          ansible.builtin.set_fact:
+            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_restore"
+      when: >
+        "'RESTORE' in volume_dr_mode"
+
+
+    - name: "Input Validation | Volume_dr_mode='RESTORE|CREATE'  only tasks"
+      block: 
+        - name: print efs_hostname
+          debug:
+            msg: 'EFS: {{ efs_hostname }}'
+        - name: "Input Validation: Assert 'efs_hostname' is not empty"
+          ansible.builtin.assert:
+            that:
+              - efs_hostname | length > 0
+            fail_msg: "'efs_hostname' must not be empty. Copy the EFS DNS from AWS web console."
+
+        - name: "Input Validation: Assert 'ocp_login_command' is not empty"
+          ansible.builtin.assert:
+            that:
+              - ocp_login_command | length > 0
+            fail_msg: "'ocp_login_command' must not be empty. Copy login command the OpenShift web console."
+
+        - name: "Input Validation: Empty .kube/ directories content"
+          ansible.builtin.file:
+            path: "{{ item }}" 
+            state: absent
+          with_fileglob:
+            - "{{ lookup('env', 'HOME') }}/.kube/*"
+            - "{{ ocp_kubeconfig }}"
+
+        - name: "Input Validation: Create .kube_pv_MODE file if it does not exist"
+          ansible.builtin.file:
+            path: "{{ ocp_kubeconfig }}"
+            state: "directory"
+            recurse: true
+            mode: "{{ default_file_permissions }}"
+
+        - name: "Input Validation: Login to kubernetes cluster"
+          ansible.builtin.shell: "{{ ocp_login_command }} --insecure-skip-tls-verify"
+
+        - name:  "Input Validation: Get OpenShift cluster name"
+          ansible.builtin.shell: >
+            oc whoami --show-console 
+            | sed -r 's|https://||g;
+            s|console.apps\.||g;
+            s|console-openshift-console.apps\.||g;
+            s|\.openshiftapps\.com||g;
+            s|\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}$||g'
+          register: ocp_cluster_name
+
+        - name:  "Input Validation: Get OpenShift api-server url"
+          ansible.builtin.shell: >
+            oc whoami --show-server
+          register: ocp_cluster_api_server
+
+        - name: "Input Validation: Set OpenShift cluster context"
+          ansible.builtin.shell: "oc config rename-context $(oc config current-context) {{ ocp_cluster_name.stdout }}"
+
+        - name: "Input Validation: Set OpenShift cluster context fact"
+          ansible.builtin.set_fact:
+            k8s_cluster_context: "{{ ocp_cluster_name.stdout }}"
+
+        - name:  "Input Validation: Copy custom kubeconfig file to custom directory"
+          ansible.builtin.copy:
+            src: "{{ lookup('env', 'HOME') }}/.kube/config"
+            dest: "{{ ocp_kubeconfig }}/config"
+            mode: u+rw,g-wx,o-rwx
+
+        - name: "Input Validation: Verify user has cluster-admin privileges"
+          kubernetes.core.k8s_info:
+            kind: Node
+            kubeconfig: "{{ ocp_kubeconfig }}/config"
+          register: ocp_nodes
+
+        - name: "Input Validation: Assert OCP-User has 'cluster-admin' role."
+          ansible.builtin.assert:
+            that:
+              - ocp_nodes.resources  | length > 0
+            fail_msg: "OCP-User was unable to list nodes. Ensure OCP-User has 'cluster-admin' privileges."
+            success_msg: "OCP-User found '{{ ocp_nodes.resources  | length }}' nodes."   
+
+  ignore_errors: false
+  become: false

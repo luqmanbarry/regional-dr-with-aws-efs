@@ -1,0 +1,9 @@
+*/.ssh
+*.pem
+*.ppk
+*.log
+*/efs-mount
+/home/ec2-user/regional-dr-with-aws-efs//.ansible-venv
+*/efs-mount
+*/dest
+*/src

@@ -1,0 +1,28 @@
+---
+- name: Static PersistentVolumes & PersistentVolumeClaims provisioning
+  hosts: localhost
+  connection: local
+  roles:
+    - role: validate_user_inputs
+      gather_facts: false
+      volume_dr_mode: 'CREATE'
+      nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+      efs_hostname: "{{ src_efs_hostname }}"
+    - role: create_volume_folder
+      become: true
+      volume_dr_mode: 'CREATE'
+      nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+      efs_hostname: "{{ src_efs_hostname }}"
+    - role: gen_pv_pvc_manifests
+      gather_facts: false
+      volume_dr_mode: 'CREATE'
+      nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+      efs_hostname: "{{ src_efs_hostname }}"
+    - role: git_commit_pv_pvc_manifests
+      gather_facts: false
+      nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+    - role: apply_pv_pvc_manifests
+      gather_facts: false
+      volume_dr_mode: 'CREATE'
+      nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+      efs_hostname: "{{ src_efs_hostname }}"

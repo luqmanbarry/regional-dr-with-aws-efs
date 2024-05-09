@@ -1,0 +1,109 @@
+---
+- name: "Create the PV/PVC volume inside target EFS."
+  block:
+    - name: "Create PV dirs tree: Set remote directory volume path"
+      ansible.builtin.set_fact:
+        __pv_remote_volume_dir: "{{ pv_efs_volume_directory | normpath | replace('//', '/') }}"
+
+    - name: "Create PV dirs tree: Set local directory volume path"
+      ansible.builtin.set_fact:
+        __pv_local_volume_dir: "{{ nfs_mount_directory }}/{{ __pv_remote_volume_dir }}"
+
+    - name: "Create PV dirs tree: Unmount EFS instance if it exists"
+      vars:
+        mount_action: "absent"
+      ansible.builtin.include_tasks: efs_mount.yaml
+
+    - name: "Create PV dirs tree: Cleanup the local mount directory"
+      ansible.builtin.file:
+        path: "{{ nfs_mount_directory }}"
+        state: "absent"
+
+    - name: "Create PV dirs tree: Create the local mount directory"
+      ansible.builtin.file:
+        path: "{{ nfs_mount_directory }}"
+        state: "directory"
+        recurse: true
+        mode: "{{ default_file_permissions }}"
+
+    - name: "Create PV dirs tree: Mount the EFS instance"
+      vars:
+        mount_action: "ephemeral"
+      ansible.builtin.include_tasks: efs_mount.yaml
+
+    - name: "Create PV dirs tree: Create the PV/PVC directory"
+      ansible.builtin.file:
+        path: "{{ __pv_local_volume_dir }}"
+        state: directory
+        recurse: true
+        mode: "{{ default_file_permissions }}"
+
+    - name: "Create PV dirs tree: Touch volumes report if it does not exists"
+      ansible.builtin.file:
+        path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
+        state: touch
+        mode: "{{ default_file_permissions }}"
+        modification_time: preserve
+        access_time: preserve
+
+    - name: "Create PV dirs tree: Check if header exists"
+      ansible.builtin.lineinfile:
+        path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
+        regexp: "^{{ pv_volumes_report_header }}"
+        state: "absent"
+      check_mode: yes
+      changed_when: false
+      register: header_exists
+
+    - ansible.builtin.debug:
+        msg: "Yes, line exists."
+      when: header_exists.found
+
+    - ansible.builtin.debug:
+        msg: "Line does not exist."
+      when: not header_exists.found
+
+    - name: "Create PV dirs tree: Add header to file"
+      ansible.builtin.lineinfile:
+        line: "{{ line_item }}"
+        path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
+        create: true
+      loop:
+        - "{{ pv_volumes_report_header }}"
+      loop_control:
+        loop_var: line_item
+      when: not header_exists.found
+
+    - name: "Create PV dirs tree: Check if PV line exists"
+      ansible.builtin.lineinfile:
+        path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
+        regexp: "^{{ business_unit }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},.*"
+        state: "absent"
+      check_mode: yes
+      changed_when: false
+      register: pv_line_exists
+
+    - ansible.builtin.debug:
+        msg: "Yes, line exists."
+      when: pv_line_exists.found
+
+    - ansible.builtin.debug:
+        msg: "Line does not exist."
+      when: not pv_line_exists.found
+
+    - name: "Create PV dirs tree: Add PV line to file"
+      ansible.builtin.lineinfile:
+        line: "{{ line_item }}"
+        path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
+        create: true
+      loop:
+        - "{{ business_unit }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},null,{{ ansible_date_time.iso8601 }},null"
+      loop_control:
+        loop_var: line_item
+      when: not pv_line_exists.found
+
+  always:
+    - name: "Create PV dirs tree: Unmount EFS instance after directory created"
+      vars:
+        mount_action: "absent"
+      ansible.builtin.include_tasks: efs_mount.yaml

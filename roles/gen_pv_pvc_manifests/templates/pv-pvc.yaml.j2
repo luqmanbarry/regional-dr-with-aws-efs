@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "{{ __pv_name }}"
+spec:
+  capacity:
+    storage: "{{ pvc_size }}Gi"
+  volumeMode: Filesystem
+  accessModes:
+{% if pv_enable_multi_mount %}
+    - ReadWriteMany
+{% else %}
+    - ReadWriteOnce
+{% endif %}
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - rw
+    - sync
+  nfs:
+    path: "{{ pv_efs_volume_directory | normpath | replace('//', '/') }}/"
+    server: "{{ efs_hostname }}"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ pvc_name }}"
+  namespace: "{{ namespace }}"
+spec:
+  resources:
+    requests:
+      storage: "{{ pvc_size }}Gi"
+  volumeMode: Filesystem
+  accessModes:
+{% if pv_enable_multi_mount %}
+    - ReadWriteMany
+{% else %}
+    - ReadWriteOnce
+{% endif %}
+  storageClassName: ""
+  volumeName: "{{ __pv_name }}"

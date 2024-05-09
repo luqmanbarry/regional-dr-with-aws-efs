@@ -1,0 +1,140 @@
+---
+{{- range $app := .Values.micro_services }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "{{ $app.namespace }}"
+spec: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: "{{ $app.name }}"
+  name: "{{ $app.name }}"
+  namespace: "{{ $app.namespace }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ $app.name }}"
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: "{{ $app.name }}"
+    spec:
+      containers:
+      - name: "{{ $app.name }}-server"
+        image: "{{ $app.image }}"
+        ports:
+          - containerPort: 8080
+        command:
+          - /bin/sh
+          - -c
+          - |-
+            while true;
+            do
+              echo "Current Timestamp: $(date +'%Y-%m-%d_%H-%M-%S-%3N')"
+              sleep 60
+            done
+        volumeMounts:
+          - mountPath: "/app/data"
+            name: "{{ $app.pvc_name }}"
+      - name: "{{ $app.name }}-data-loader"
+        ports:
+          - containerPort: 8081
+        resources:
+          requests:
+            memory: 100Mi
+            cpu: 50m
+          limits:
+            memory: 300Mi
+            cpu: 250m
+        env:
+          - name: RW_TEST_PATH
+            value: "raw-bin"
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: VOL_MOUNT_PATH
+            value: "/app/data"
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+        image: "{{ $app.image }}"
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: "/app/data"
+            name: "{{ $app.pvc_name }}"
+        command:
+          - /bin/sh
+          - -c
+          - |
+            mkdir -p "${VOL_MOUNT_PATH}/${RW_TEST_PATH}"
+            
+            while true; 
+            do 
+              CURRENT_TIME="$(date +'%Y-%m-%d-%H-%M')"
+              RAW_BIN_DIR="${VOL_MOUNT_PATH}/${RW_TEST_PATH}/${CURRENT_TIME}"
+              DATA_DIR="${VOL_MOUNT_PATH}/${CURRENT_TIME}/POD_${POD_NAME}/NODE_${NODE_NAME}"
+              mkdir -p "${DATA_DIR}";
+              mkdir -p "${RAW_BIN_DIR}"
+
+              for i in {1..10}; 
+              do
+                dd if=/dev/urandom of="${RAW_BIN_DIR}/static-pv-${i}.log" bs=1M count=50;
+              done
+              
+              output="$(date +'%Y-%m-%d_%H-%M-%S-%3N')"; 
+              file_name="static-pv-$(date +'%m%d%Y-T%H%M').log";
+              echo "Current Timestamp: ${output}";
+              echo "Written on: ${output}" >> "${DATA_DIR}/${file_name}";
+              sleep 900; 
+            done
+      volumes:
+      - name: "{{ $app.pvc_name }}"
+        persistentVolumeClaim:
+          claimName: "{{ $app.pvc_name }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: "{{ $app.name }}"
+  name: "{{ $app.name }}"
+  namespace: "{{ $app.namespace }}"
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: "{{ $app.name }}"
+  type: LoadBalancer
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: "{{ $app.name }}"
+  namespace: "{{ $app.namespace }}"
+  labels:
+    app: "{{ $app.name }}"
+    service: "{{ $app.name }}"
+spec:
+  to:
+    kind: Service
+    name: "{{ $app.name }}"
+  port:
+    targetPort: 8080
+---
+{{- end -}}

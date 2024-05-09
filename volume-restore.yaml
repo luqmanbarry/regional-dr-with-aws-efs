@@ -1,0 +1,23 @@
+---
+- name: Static PersistentVolumes & PersistentVolumeClaims restoration
+  hosts: localhost
+  connection: local
+  roles:
+    - role: validate_user_inputs
+      gather_facts: false
+      volume_dr_mode: 'RESTORE'
+      nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
+      efs_hostname: "{{ dest_efs_hostname }}"
+    - role: stop_efs_replication
+      gather_facts: false
+      volume_dr_mode: 'RESTORE'
+      nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
+      efs_hostname: "{{ dest_efs_hostname }}"
+    - role: update_pv_pvc_manifests
+      gather_facts: false
+      volume_dr_mode: 'RESTORE'
+      nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
+      efs_hostname: "{{ dest_efs_hostname }}"
+    - role: git_commit_pv_pvc_manifests
+      gather_facts: false
+      nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
