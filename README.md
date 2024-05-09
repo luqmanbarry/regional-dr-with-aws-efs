@@ -15,7 +15,7 @@ This solution may be applied to any of the following scenarios:
 
 - Data protection
 - Application migration
-- Data proximity, exposing read-only data to workloads running in other regions
+- Data proximity, exposing read-only data to workloads deployed in other regions
 - Regional failover due to a region or critical service within that region being down
 - Protection from accidental data deletion. For example, a mistake causes the entire storage service or persistent volume to be deleted
 - Business continuity wargaming
@@ -29,7 +29,7 @@ If you need a refresher on the topic of "Disaster Recovery" in the cloud, I sugg
 
 We'll discuss the solution in two phases, before and after the disaster.
 
-### Pre-Disaster Phase
+### Phase I: Pre-Disaster
 
 1. Provision the primary OpenShift cluster in region A.
 2. Provision the secondary OpenShift cluster in region B.
@@ -68,7 +68,7 @@ We'll discuss the solution in two phases, before and after the disaster.
 9. Run [volume-create](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.
 10. Deploy a few [sample stateful](./sample-apps/) (with static volumes) on OpenShift-Primary.
 
-### Post-Disaster Phase (Recovery)
+### Phase II: Post-Disaster (Recovery)
 
 1. Provision OpenShift-Secondary in Region B - If not provisioned already.
 2. Integrate OpenShift-Secondary with EFS-Secondary instance - if not done already.
