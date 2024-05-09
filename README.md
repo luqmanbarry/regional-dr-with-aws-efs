@@ -1,5 +1,6 @@
 # Application regional disaster recovery using ROSA (OpenShift on AWS) and AWS EFS - An unpopular yet effective approach
 
+
 ## Introduction
 
 Disaster ranges from mistakenly deleting data to an entire cloud region or critical service within that region being down. There are many commercial and freemium solutions offerings around this business need.
@@ -23,6 +24,8 @@ This solution may be applied to any of the following scenarios:
 If you need a refresher on the topic of "Disaster Recovery" in the cloud, I suggest you read [this article](https://aws.amazon.com/what-is/disaster-recovery/) from AWS.
 
 ## Solution Overview
+
+![regional-dr-efs-diagram.jpg](assets/region-dr-efs-diagram.jpg)
 
 We'll discuss the solution in two phases, before and after the disaster.
 
