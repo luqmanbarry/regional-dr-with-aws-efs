@@ -29,7 +29,13 @@ If you need a refresher on the topic of "Disaster Recovery" in the cloud, I sugg
 
 We'll discuss the solution in two phases, before and after the disaster.
 
-### Phase I: Pre-Disaster
+### Phase I: Pre-Disaster (Disaster Readiness)
+
+During the readiness phase, in conjunction with our RPO and RTO objectives, we develop the fall-back plan that will be executed in the event of a disaster. Keep in mind that such a plan should be periodically tested to identify any cracks that may have been introduced over time due to technology maturity, and life cycle. 
+
+Moreover, in this phase most if not all application deployments and network traffic will be directed at the Primary region.
+
+A a higher level, the procedure would look like this:
 
 1. Provision the primary OpenShift cluster in region A.
 2. Provision the secondary OpenShift cluster in region B.
@@ -68,7 +74,11 @@ We'll discuss the solution in two phases, before and after the disaster.
 9. Run [volume-create](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.
 10. Deploy a few [sample stateful](./sample-apps/) (with static volumes) on OpenShift-Primary.
 
-### Phase II: Post-Disaster (Recovery)
+### Phase II: Post-Disaster (Disaster Recovery)
+
+In contrast, the recovery phase is when the Secondary region takes over and becomes Primary, applications are redeployed (if not already) and network traffic is rerouted.
+
+A a higher level, the procedure would look like this:
 
 1. Provision OpenShift-Secondary in Region B - If not provisioned already.
 2. Integrate OpenShift-Secondary with EFS-Secondary instance - if not done already.
@@ -77,9 +87,10 @@ We'll discuss the solution in two phases, before and after the disaster.
   - Enable dynamic volume provisioning as well, [configure](https://cloud.redhat.com/experts/rosa/aws-efs/) the AWS EFS CSI Driver Operator. Keep in mind that dynamic volumes are not supported by this solution.
 3. Run the [volume-restore](.ci/volume-restore.sh) pipeline to restore static volumes onto OpenShift-Secondary.
 
-    This process will scan the `<playbook-dir>/PV-PVCs/primary/*` directory, create a corresponding PV/PVC for each manifest found; and save the the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/*`.
+    This process will scan the `<playbook-dir>/PV-PVCs/primary/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/*`.
 
 4. Redeploy your applications onto OpenShift-Secondary.
+5. Reroute network traffic to the Secondary region.
 
 ## Implementation
 
