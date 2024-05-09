@@ -35,7 +35,7 @@ During the readiness phase, in conjunction with our RPO and RTO objectives, we d
 
 Moreover, in this phase most if not all application deployments and network traffic will be directed at the Primary region.
 
-A a higher level, the procedure would look like this:
+At a higher level, the procedure would look like this:
 
 1. Provision the primary OpenShift cluster in region A.
 2. Provision the secondary OpenShift cluster in region B.
@@ -78,7 +78,7 @@ A a higher level, the procedure would look like this:
 
 In contrast, the recovery phase is when the Secondary region takes over and becomes Primary, applications are redeployed (if not already) and network traffic is rerouted.
 
-A a higher level, the procedure would look like this:
+At a higher level, the procedure would look like this:
 
 1. Provision OpenShift-Secondary in Region B - If not provisioned already.
 2. Integrate OpenShift-Secondary with EFS-Secondary instance - if not done already.
