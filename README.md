@@ -15,7 +15,7 @@ This solution may be applied to any of the following scenarios:
 
 - Data protection
 - Application migration
-- Data proximity, exposing read-only data to other applications in other regions
+- Data proximity, exposing read-only data to workloads running in other regions
 - Regional failover due to a region or critical service within that region being down
 - Protection from accidental data deletion. For example, a mistake causes the entire storage service or persistent volume to be deleted
 - Business continuity wargaming
