@@ -91,7 +91,7 @@ spec:
               mkdir -p "${DATA_DIR}";
               mkdir -p "${RAW_BIN_DIR}"
 
-              for i in {1..10}; 
+              for i in {1..20}; 
               do
                 dd if=/dev/urandom of="${RAW_BIN_DIR}/static-pv-${i}.log" bs=1M count=50;
               done
@@ -100,7 +100,7 @@ spec:
               file_name="static-pv-$(date +'%m%d%Y-T%H%M').log";
               echo "Current Timestamp: ${output}";
               echo "Written on: ${output}" >> "${DATA_DIR}/${file_name}";
-              sleep 900; 
+              sleep 600; 
             done
       volumes:
       - name: "{{ $app.pvc_name }}"

@@ -88,7 +88,7 @@
           ansible.builtin.assert:
             that:
               - ocp_nodes.resources  | length > 0
-            fail_msg: "OCP-User was unable to list nodes. Ensure OCP-User has 'cluster-admin' privileges."
+            fail_msg: "OCP-User was unable to list nodes. Verify OCP-User has 'cluster-admin' privileges."
             success_msg: "OCP-User found '{{ ocp_nodes.resources  | length }}' nodes." 
 
     - name: "Input Validation | Volume_dr_mode=CREATE only tasks"

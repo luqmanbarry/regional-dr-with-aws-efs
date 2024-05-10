@@ -15,7 +15,7 @@
       args:
         chdir: "{{ pv_git_commit_dir }}"
 
-    - name: "Git: Ensure nfs mount directories are ignored"
+    - name: "Git: Verify nfs mount directories are ignored"
       ansible.builtin.lineinfile:
         line: "{{ ignore_item }}"
         path: "{{ git_ignore_filename }}"
