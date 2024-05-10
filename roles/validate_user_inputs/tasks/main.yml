@@ -156,7 +156,7 @@
               ansible.builtin.fail:
                 msg: "The requested PersistentVolumeClaim ('{{ pvc_name }}') exists already."
               when: >
-                pvc_lookup is defined or
+                pvc_lookup is defined &&
                 pvc_lookup | length > 0
           when: volume_create_strict_mode == true
       when: "'CREATE' in volume_dr_mode"
