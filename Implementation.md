@@ -315,8 +315,6 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
-    # OpenShift-Primary Cluster Name
-    export cluster_name="rosa-primary"
     # OpenShift-Primary Login Command
     export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
 

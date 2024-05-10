@@ -6,7 +6,7 @@ dest_efs_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
 # efs_root_access_point: "fsap-01fbbe137b15eb957" # Permission: uid(65534),gid(0),second-gid(0,65534)
 efs_volumes_root_dir: "/k8s-static-volumes" # EFS AccessPoint directory
 # volume_dr_mode: 'CREATE' #Options: CREATE|RESTORE
-volume_create_strict_mode: true # True means fail if volume exists already; False means otherwise
+volume_create_strict_mode: false # True means fail if volume exists already; False means otherwise
 
 # business_unit: "get-from-env"
 # cluster_name: "get-from-env"
