@@ -309,7 +309,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-00747965416d5a91d.efs.us-east-1.amazonaws.com"
+    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
@@ -356,7 +356,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-00747965416d5a91d.efs.us-east-1.amazonaws.com"
+    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
@@ -402,7 +402,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-00747965416d5a91d.efs.us-east-1.amazonaws.com"
+    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
@@ -431,7 +431,30 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     ![shipping-pvc](assets/shipping-pvc.png)
 
-### Verify volumes directory tree
+As a results, 3 persistent volumes manifests have been added to the git repository.
+
+```sh
+tree PV-PVCs/
+PV-PVCs/
+└── primary
+    └── sales
+        └── rosa-primary
+            ├── point-of-sale
+            │   └── point-of-sale
+            │       └── pv-pvc_point-of-sale.yaml
+            ├── shipping
+            │   └── shipping-dev
+            │       └── pv-pvc_shipping-dev.yaml
+            └── warehouse
+                └── warehouse-dev
+                    └── pv-pvc_warehouse-store.yaml
+
+9 directories, 3 files
+```
+
+### Verify data written to efs-primary
+
+![efs-primary-iops](assets/efs-primary-iops.png)
 
 From the Bastion-Primary, mount the EFS instance at `./efs` directory and list its content. Notice the playbook added the `k8s-static-volumes` as prefix for all statically provisioned volumes. You may change this to something else from the [inputs.yaml](vars/inputs.yaml) file.
 
@@ -459,22 +482,46 @@ total 12K
 Run the tree command to view the volumes directory tree.
 
 ```sh
-sudo tree efs/
-efs/
+sudo tree -L 5 efs
+efs
 └── k8s-static-volumes
     ├── sales
     │   ├── point-of-sale
     │   │   └── point-of-sale
-    │   │       └── point-of-sale
+    │   │       ├── 2024-05-10-18-31
+    │   │       ├── 2024-05-10-18-33
+    │   │       ├── 2024-05-10-18-43
+    │   │       ├── 2024-05-10-18-49
+    │   │       ├── 2024-05-10-18-54
+    │   │       ├── 2024-05-10-19-00
+    │   │       ├── 2024-05-10-19-05
+    │   │       ├── point-of-sale
+    │   │       └── raw-bin
     │   ├── shipping
     │   │   └── shipping-dev
+    │   │       ├── 2024-05-10-18-31
+    │   │       ├── 2024-05-10-18-33
+    │   │       ├── 2024-05-10-18-43
+    │   │       ├── 2024-05-10-18-49
+    │   │       ├── 2024-05-10-18-54
+    │   │       ├── 2024-05-10-19-00
+    │   │       ├── 2024-05-10-19-05
+    │   │       ├── raw-bin
     │   │       └── shipping-dev
     │   └── warehouse
     │       └── warehouse-dev
+    │           ├── 2024-05-10-18-31
+    │           ├── 2024-05-10-18-33
+    │           ├── 2024-05-10-18-43
+    │           ├── 2024-05-10-18-49
+    │           ├── 2024-05-10-18-54
+    │           ├── 2024-05-10-19-00
+    │           ├── 2024-05-10-19-05
+    │           ├── raw-bin
     │           └── warehouse-store
     └── volumes-report.csv
 
-11 directories, 1 file
+35 directories, 1 file
 ```
 Up to this point we've provisioned three persistent volumes in different namespaces on the OpenShift-Primary cluster. Next, let's deploy the three (3) sample applications to verify that they can indeed mount these volumes and write to them.
 
@@ -514,7 +561,7 @@ Up to this point we've provisioned three persistent volumes in different namespa
 
 To recap, based on RPO and RTO one should decide on whether to provision OpenShift-Secondary and let it be on standby, or wait until disaster occurs.
 
-For the purpose of this demo, both OpenShift-Primary and OpenShift-Secondary are active.
+For the purpose of this demo, both OpenShift-Primary and OpenShift-Secondary wre provisioned at the same time.
 
 ## Environment Setup
 
@@ -567,9 +614,9 @@ As the failover will take place in the secondary region (`us-west-2`), in a diff
     export AWS_REGION='us-east-1'
 
     # EFS-Primary
-    export src_efs_hostname="fs-00747965416d5a91d.efs.us-east-1.amazonaws.com"
+    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
     # EFS-Secondary
-    export dest_efs_hostname="fs-03847965416d5a91d.efs.us-east-1.amazonaws.com"
+    export dest_efs_hostname="fs-0e420f11e0641a5c3.efs.us-west-2.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
