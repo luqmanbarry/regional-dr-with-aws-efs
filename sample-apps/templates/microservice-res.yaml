@@ -100,7 +100,7 @@ spec:
               file_name="static-pv-$(date +'%m%d%Y-T%H%M').log";
               echo "Current Timestamp: ${output}";
               echo "Written on: ${output}" >> "${DATA_DIR}/${file_name}";
-              sleep 600; 
+              sleep 300; 
             done
       volumes:
       - name: "{{ $app.pvc_name }}"
