@@ -1,89 +1,6 @@
 ---
 - name: "Verify user inputs match required string length"
   block:
-    - name: "Input Validation | Volume_dr_mode=CREATE only tasks"
-      block:
-        - name: "Input Validation: Assert 'business_unit' string size >= 2 and <= 25 characters"
-          ansible.builtin.assert:
-            that:
-              - business_unit | length >= 2
-              - business_unit | length <= 50
-            fail_msg: "'business_unit' str length must be between 2 and 253 characters"
-            success_msg: "'business_unit' str length value is '{{ business_unit | length }}'"
-
-        - name: "Input Validation: Assert 'cluster_name' string size >= 6 and <= 15 characters"
-          ansible.builtin.assert:
-            that:
-              - cluster_name | length >= 6
-              - cluster_name | length <= 15
-            fail_msg: "'cluster_name' str length must be between 2 and 253 characters"
-            success_msg: "'cluster_name' str length value is '{{ cluster_name | length }}'"
-
-        - name: "Input Validation: Assert 'application_name' str length >= 2 and <= 25 characters"
-          ansible.builtin.assert:
-            that:
-              - application_name | length >= 2
-              - application_name | length <= 50
-            fail_msg: "'application_name' str length must be between 2 and 253 characters"
-            success_msg: "'application_name' str length value is '{{ application_name | length }}'"
-
-        - name: "Input Validation: Assert 'namespace' str length >= 2 and <= 25 characters"
-          ansible.builtin.assert:
-            that:
-              - namespace | length >= 2
-              - namespace | length <= 50
-            fail_msg: "'namespace' str length must be between 2 and 253 characters"
-            success_msg: "'namespace' str length value is '{{ namespace | length }}'"
-
-        - name: "Input Validation: Assert 'pvc_name' str length >= 2 and <= 25 characters"
-          ansible.builtin.assert:
-            that:
-              - pvc_name | length >= 2
-              - pvc_name | length <= 50
-            fail_msg: "'pvc_name' str length must be between 2 and 253 characters"
-            success_msg: "'pvc_name' str length value is '{{ pvc_name | length }}'"
-        
-        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC create"
-          ansible.builtin.set_fact:
-            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_create"
-
-        - ansible.builtin.set_fact:
-            kconfig: "{{ ocp_kubeconfig }}/config"
-        
-        - name: "Input Validation: Assert 'pvc_size' in Gi is > 0"
-          ansible.builtin.assert:
-            that:
-              - pvc_size | int > 0
-            fail_msg: "'pvc_size' must be greater than zero (0)"
-            success_msg: "'pvc_size' value is '{{ pvc_size }}'"
-
-        - name: "Input Validation: Fail if PVC exists already"
-          block:
-            - set_fact:
-                pvc_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolumeClaim', namespace=pvc_name) }}"
-
-            - name: "Input Validation: Fail if pvc_lookup result is not empty"
-              ansible.builtin.fail:
-                msg: "The requested PersistentVolumeClaim ('{{ pvc_name }}') exists already."
-              when: >
-                pvc_lookup is defined or
-                pvc_lookup | length > 0
-          when: volume_create_strict_mode == true
-
-      when: "'CREATE' in volume_dr_mode"
-
-
-    - name: "Input Validation | Volume_dr_mode=RESTORE only tasks"
-      block:
-        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC restore"
-          ansible.builtin.set_fact:
-            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_restore"
-        - ansible.builtin.set_fact:
-            kconfig: "{{ ocp_kubeconfig }}/config"
-      when: >
-        "'RESTORE' in volume_dr_mode"
-
-
     - name: "Input Validation | Volume_dr_mode='RESTORE|CREATE'  only tasks"
       block: 
         - name: print efs_hostname
@@ -159,6 +76,85 @@
               - ocp_nodes.resources  | length > 0
             fail_msg: "OCP-User was unable to list nodes. Ensure OCP-User has 'cluster-admin' privileges."
             success_msg: "OCP-User found '{{ ocp_nodes.resources  | length }}' nodes."   
+    - name: "Input Validation | Volume_dr_mode=CREATE only tasks"
+      block:
+        - name: "Input Validation: Assert 'business_unit' string size >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - business_unit | length >= 2
+              - business_unit | length <= 50
+            fail_msg: "'business_unit' str length must be between 2 and 253 characters"
+            success_msg: "'business_unit' str length value is '{{ business_unit | length }}'"
 
+        - name: "Input Validation: Assert 'cluster_name' string size >= 6 and <= 15 characters"
+          ansible.builtin.assert:
+            that:
+              - cluster_name | length >= 6
+              - cluster_name | length <= 15
+            fail_msg: "'cluster_name' str length must be between 2 and 253 characters"
+            success_msg: "'cluster_name' str length value is '{{ cluster_name | length }}'"
+
+        - name: "Input Validation: Assert 'application_name' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - application_name | length >= 2
+              - application_name | length <= 50
+            fail_msg: "'application_name' str length must be between 2 and 253 characters"
+            success_msg: "'application_name' str length value is '{{ application_name | length }}'"
+
+        - name: "Input Validation: Assert 'namespace' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - namespace | length >= 2
+              - namespace | length <= 50
+            fail_msg: "'namespace' str length must be between 2 and 253 characters"
+            success_msg: "'namespace' str length value is '{{ namespace | length }}'"
+
+        - name: "Input Validation: Assert 'pvc_name' str length >= 2 and <= 25 characters"
+          ansible.builtin.assert:
+            that:
+              - pvc_name | length >= 2
+              - pvc_name | length <= 50
+            fail_msg: "'pvc_name' str length must be between 2 and 253 characters"
+            success_msg: "'pvc_name' str length value is '{{ pvc_name | length }}'"
+        
+        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC create"
+          ansible.builtin.set_fact:
+            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_create"
+
+        - ansible.builtin.set_fact:
+            kconfig: "{{ ocp_kubeconfig }}/config"
+        
+        - name: "Input Validation: Assert 'pvc_size' in Gi is > 0"
+          ansible.builtin.assert:
+            that:
+              - pvc_size | int > 0
+            fail_msg: "'pvc_size' must be greater than zero (0)"
+            success_msg: "'pvc_size' value is '{{ pvc_size }}'"
+
+        - name: "Input Validation: Fail if PVC exists already"
+          block:
+            - set_fact:
+                pvc_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolumeClaim', namespace=pvc_name) }}"
+
+            - name: "Input Validation: Fail if pvc_lookup result is not empty"
+              ansible.builtin.fail:
+                msg: "The requested PersistentVolumeClaim ('{{ pvc_name }}') exists already."
+              when: >
+                pvc_lookup is defined or
+                pvc_lookup | length > 0
+          when: volume_create_strict_mode == true
+      when: "'CREATE' in volume_dr_mode"
+
+    - name: "Input Validation | Volume_dr_mode=RESTORE only tasks"
+      block:
+        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC restore"
+          ansible.builtin.set_fact:
+            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_restore"
+        - ansible.builtin.set_fact:
+            kconfig: "{{ ocp_kubeconfig }}/config"
+      when: >
+        "'RESTORE' in volume_dr_mode"
+        
   ignore_errors: false
   become: false
