@@ -648,7 +648,7 @@ ooc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=ht
 helm template volumes-dr-demo ./sample-apps | oc apply -f -
 ```
 
-If all goes well (it should), the pods should be able to mount the restored volumes and writing to them.
+If all goes well (it should), the pods should be able to mount the restored volumes and write to them.
 
 
 
