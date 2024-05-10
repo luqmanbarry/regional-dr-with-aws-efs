@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "sales.shipping.shipping-dev.shipping-dev"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-shipping"
+spec:
+  capacity:
+    storage: "75Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - rw
+    - sync
+  nfs:
+    path: "/k8s-static-volumes/sales/shipping/shipping-dev/"
+    server: "fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "shipping-dev"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-shipping"
+  namespace: "shipping-dev"
+spec:
+  resources:
+    requests:
+      storage: "75Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: "sales.shipping.shipping-dev.shipping-dev"
