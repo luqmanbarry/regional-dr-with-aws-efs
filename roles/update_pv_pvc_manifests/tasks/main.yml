@@ -17,7 +17,7 @@
 
     - name: "Update PV/PVC: Set __pv_secondary_manifests_paths fact"
       ansible.builtin.set_fact:
-        __pv_secondary_manifests_paths: "{{ __pv_secondary_manifests_paths | default([]) | union([ item | replace('primary','secondary') ]) }}"
+        __pv_secondary_manifests_paths: "{{ __pv_secondary_manifests_paths | default([]) | union([ item | replace('/primary/','/secondary/') ]) }}"
       with_items: 
         - "{{ __pv_primary_manifests_paths }}"
 
