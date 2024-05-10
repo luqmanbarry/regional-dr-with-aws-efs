@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "sales.warehouse.warehouse-dev.warehouse-store"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-warehouse"
+spec:
+  capacity:
+    storage: "200Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - rw
+    - sync
+  nfs:
+    path: "/k8s-static-volumes/sales/warehouse/warehouse-dev/"
+    server: "fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "warehouse-store"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-warehouse"
+  namespace: "warehouse-dev"
+spec:
+  resources:
+    requests:
+      storage: "200Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: "sales.warehouse.warehouse-dev.warehouse-store"
