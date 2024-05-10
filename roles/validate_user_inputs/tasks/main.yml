@@ -1,6 +1,20 @@
 ---
 - name: "Verify user inputs match required string length"
   block:
+    - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC create"
+      ansible.builtin.set_fact:
+        ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_create"
+      when: "'CREATE' in volume_dr_mode"
+
+    - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC restore"
+      ansible.builtin.set_fact:
+        ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_restore"
+      when: "'RESTORE' in volume_dr_mode"
+    
+    - name:  "Input Validation: Define cluster current execution"
+      ansible.builtin.set_fact:
+        kconfig: "{{ ocp_kubeconfig }}/config"
+
     - name: "Input Validation | Volume_dr_mode='RESTORE|CREATE'  only tasks"
       block: 
         - name: print efs_hostname
@@ -75,7 +89,8 @@
             that:
               - ocp_nodes.resources  | length > 0
             fail_msg: "OCP-User was unable to list nodes. Ensure OCP-User has 'cluster-admin' privileges."
-            success_msg: "OCP-User found '{{ ocp_nodes.resources  | length }}' nodes."   
+            success_msg: "OCP-User found '{{ ocp_nodes.resources  | length }}' nodes." 
+
     - name: "Input Validation | Volume_dr_mode=CREATE only tasks"
       block:
         - name: "Input Validation: Assert 'business_unit' string size >= 2 and <= 25 characters"
@@ -145,16 +160,6 @@
                 pvc_lookup | length > 0
           when: volume_create_strict_mode == true
       when: "'CREATE' in volume_dr_mode"
-
-    - name: "Input Validation | Volume_dr_mode=RESTORE only tasks"
-      block:
-        - name: "Input Validation: Define cluster kubeconfig directory fact for PV/PVC restore"
-          ansible.builtin.set_fact:
-            ocp_kubeconfig: "{{ lookup('env', 'HOME') }}/.kube_pv_restore"
-        - ansible.builtin.set_fact:
-            kconfig: "{{ ocp_kubeconfig }}/config"
-      when: >
-        "'RESTORE' in volume_dr_mode"
         
   ignore_errors: false
   become: false

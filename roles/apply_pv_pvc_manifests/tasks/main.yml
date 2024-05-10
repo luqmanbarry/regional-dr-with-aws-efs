@@ -15,7 +15,7 @@
         api_version: v1
         kind: Namespace
         state: present
-        kubeconfig: "{{ ocp_kubeconfig }}/config"
+        kubeconfig: "{{ kconfig }}"
       register: ns_result
       retries: 6
       delay: 10
@@ -25,14 +25,14 @@
       kubernetes.core.k8s:
         state: absent
         template: "{{ __mount_testPod_template }}"
-        kubeconfig: "{{ ocp_kubeconfig }}/config"
+        kubeconfig: "{{ kconfig }}"
       failed_when: false
 
     - name: "Apply PV/PVC: Apply the PV & PVC manifests"
       kubernetes.core.k8s:
         state: present
         src: "{{ pv_git_volume_manifest_name }}"
-        kubeconfig: "{{ ocp_kubeconfig }}/config"
+        kubeconfig: "{{ kconfig }}"
       register: pv_result
       retries: 3
       delay: 10
@@ -45,7 +45,7 @@
         state: present
         force: true
         template: "{{ __mount_testPod_template }}"
-        kubeconfig: "{{ ocp_kubeconfig }}/config"
+        kubeconfig: "{{ kconfig }}"
       retries: 6
       delay: 10
 
@@ -89,7 +89,7 @@
       kubernetes.core.k8s:
         state: absent
         template: "{{ __mount_testPod_template }}"
-        kubeconfig: "{{ ocp_kubeconfig }}/config"
+        kubeconfig: "{{ kconfig }}"
     
     - name: "Apply PV/PVC: Sleep for 90 seconds and continue"
       ansible.builtin.wait_for:
