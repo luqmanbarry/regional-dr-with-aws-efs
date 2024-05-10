@@ -19,7 +19,7 @@ unzip awscliv2.zip
 sudo ./aws/install
 rm -rf awscliv2.zip aws
 
-OCP_CLUSTER_DOMAIN="apps.classic-102.u7km.p1.openshiftapps.com" # Change this to your cluster domain
+OCP_CLUSTER_DOMAIN="apps.rosa-primary.zd0h.p1.openshiftapps.com" # Change this to your cluster domain
 curl -O "https://downloads-openshift-console.$OCP_CLUSTER_DOMAIN/amd64/linux/oc.tar"
 tar xvf oc.tar
 sudo cp -Zv oc /usr/local/bin

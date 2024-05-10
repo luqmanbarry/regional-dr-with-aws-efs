@@ -77,7 +77,7 @@
     - name: "Create PV dirs tree: Check if PV line exists"
       ansible.builtin.lineinfile:
         path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
-        regexp: "^{{ business_unit }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},.*"
+        regexp: "^{{ business_unit }},{{ cluster_name }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},.*"
         state: "absent"
       check_mode: yes
       changed_when: false
@@ -97,7 +97,7 @@
         path: "{{ nfs_mount_directory }}/{{ pv_volumes_report_filename }}"
         create: true
       loop:
-        - "{{ business_unit }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},null,{{ ansible_date_time.iso8601 }},null"
+        - "{{ business_unit }},{{ cluster_name }},{{ application_name }},{{ namespace }},{{ pvc_name }},{{ pvc_size }},{{ efs_hostname }},null,{{ ansible_date_time.iso8601 }},null"
       loop_control:
         loop_var: line_item
       when: not pv_line_exists.found

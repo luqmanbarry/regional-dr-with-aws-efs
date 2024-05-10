@@ -51,13 +51,13 @@ At a higher level, the procedure would look like this:
 7. Implement the automation process (ie: Ansible...etc) for tenants (app teams) to request static persistent volumes on OpenShift-Primary.
 
     The [volume-create](./volume-create.yaml) playbook works as follows:
-    - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, application_name, pvc_name, pvc_size, namespace, ocp_login_command
+    - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
     - Validate user inputs for character lengths, OpenShift cluster-admin permission, ...etc.
-    - Create the volume directory tree as: `/<prefix>/<business_unit>/<application_name>/<namespace>/<pvc_name>`.
+    - Create the volume directory tree as: `/<prefix>/<business_unit>/<cluster_name>/<application_name>/<namespace>/<pvc_name>`.
     - Using the predefined PV/PVC template, replace parameters such as <volume_name>, <volume_namespace>, <volume_nfs_server>, <volume_nfs_path>, and save the output manifest to a directory local to the repository.
     - Apply the PV/PVC manifest to OpenShift-Primary; the namespace will be created if it does not exist.
     - Commit and push the PV/PVC manifest to a git SCM.
-      - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/primary/<business_unit>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
+      - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/primary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
     - Wrap the [volume-create](.ci/volume-create.sh) process into a proper CI pipeline with user inputs provided in the form of job parameters.
 8. Implement the automation process (ie: Ansible..etc) for restoring the static volumes on OpenShift-Secondary.
 
@@ -68,7 +68,7 @@ At a higher level, the procedure would look like this:
      - Recursively scan the PV-PVCs directory, and list all volume manifests used for OpenShift-Primary; for each persistent-volume manifest, replace the EFS-Primary hostname with that of EFS-Secondary.
      - Apply the secondary PV/PVC manifests on OpenShit-Secondary.
      - Commit the secondary PV/PVC manifests to git SCM.
-       - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/secondary/<business_unit>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
+       - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/secondary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
      - Wrap the [volume-restore](.ci/volume-restore.sh) process into a proper CI pipeline with user inputs provided as job parameters.
 
 9. Run [volume-create](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.

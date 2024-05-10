@@ -6,8 +6,10 @@ dest_efs_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
 # efs_root_access_point: "fsap-01fbbe137b15eb957" # Permission: uid(65534),gid(0),second-gid(0,65534)
 efs_volumes_root_dir: "/k8s-static-volumes" # EFS AccessPoint directory
 # volume_dr_mode: 'CREATE' #Options: CREATE|RESTORE
+volume_create_strict_mode: true # True means fail if volume exists already; False means otherwise
 
 # business_unit: "get-from-env"
+# cluster_name: "get-from-env"
 # application_name: "get-from-env"
 # namespace: "get-from-env"
 # pvc_name: "get-from-env"
@@ -29,12 +31,12 @@ pv_git_commit_token: "take-from-sys-env"
 pv_git_commit_branch: "main"
 pv_git_volume_root_directory: "{{ pv_git_commit_dir }}/PV-PVCs/primary"
 pv_git_volume_restore_root_directory: "{{ pv_git_commit_dir }}/PV-PVCs/secondary"
-pv_git_volume_directory: "{{ pv_git_volume_root_directory }}/{{ business_unit }}/{{ application_name }}/{{ namespace }}"
+pv_git_volume_directory: "{{ pv_git_volume_root_directory }}/{{ business_unit }}/{{ cluster_name }}/{{ application_name }}/{{ namespace }}"
 pv_manifest_file_prefix: "pv-pvc_"
 pv_manifest_filename: "{{ pv_manifest_file_prefix }}{{ pvc_name }}.yaml"
 pv_git_volume_manifest_name: "{{ pv_git_volume_directory }}/{{ pv_manifest_filename }}"
 pv_volumes_report_filename: "{{ efs_volumes_root_dir | normpath }}/volumes-report.csv"
-pv_volumes_report_header: "BUSINESS_UNIT,APPLICATION_NAME,NAMESPACE,PVC_NAME,PVC_SIZE,PRIMARY_NFS_HOSTNAME,SECONDARY_NFS_HOSTNAME,CREATED_AT,UPDATED_AT"
+pv_volumes_report_header: "BUSINESS_UNIT,CLUSTER_NAME,APPLICATION_NAME,NAMESPACE,PVC_NAME,PVC_SIZE,PRIMARY_NFS_HOSTNAME,SECONDARY_NFS_HOSTNAME,CREATED_AT,UPDATED_AT"
 primary_region: "us-east-1"
 secondary_region: "us-west-2"
 

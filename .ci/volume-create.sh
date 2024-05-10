@@ -31,6 +31,7 @@ ansible-playbook volume-create.yaml \
   -e "ocp_login_command=\"$ocp_login_command\"" \
   -e "src_efs_hostname=\"$src_efs_hostname\"" \
   -e "business_unit=\"$business_unit\"" \
+  -e "cluster_name=\"$cluster_name\"" \
   -e "application_name=\"$application_name\"" \
   -e "namespace=\"$namespace\"" \
   -e "pvc_name=\"$pvc_name\"" \

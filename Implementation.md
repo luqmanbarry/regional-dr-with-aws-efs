@@ -32,9 +32,6 @@ Create the efs-primary SecurityGroup and set proper inbound/outbound rules. For 
 
 ## 4. EFS-Primary
 
-> [!IMPORTANT]
-> File system protection should be enabled for EFS-Primary and disabled for EFS-Secondary. This is a requirement to turn on replication.
-
 1. Specify general settings.
 
     ![efs-create](assets/efs-primary-create.png)
@@ -43,7 +40,14 @@ Create the efs-primary SecurityGroup and set proper inbound/outbound rules. For 
 
     ![efs-mount-targets](assets/efs-mount-targets.png)
 
-3. Configure the EFS default access point
+3. Specify the file system [access policy](scripts/efs-policy-primary.json). The `aws:SourceIp` must contain at least the CIDR of the OpenShift cluster; and any other IP ranges from which the EFS instance will be accessed from.
+
+    ![efs-access-policy](assets/efs-access-policy.png)
+
+4. Review the values provided and create the EFS
+
+
+5. Configure the EFS default access point
 
     > [!IMPORTANT]
     > `POSIX User` and `Root directory creation permissions` should match what's in the screenshot below for apps running on OpenShift to be able to read/write to EFS. You may apply more restrictions by setting UID and GID to specific numbers other than zero (0), apps accessing the share will have to be configured to run as these UIDs and GIDs.
@@ -51,13 +55,6 @@ Create the efs-primary SecurityGroup and set proper inbound/outbound rules. For 
     For enforcing even more data access boundaries, one could add the logic to create an EFS AccessPoint for each distinct business unit; which is preferred in my opinion.
 
     ![efs-access-point](assets/efs-primary-ap.png)
-
-
-4. Specify the file system [access policy](scripts/access-policy-primary.json). The `aws:SourceIp` must contain at least the CIDR of the OpenShift cluster; and any other IP ranges from which the EFS instance will be accessed from.
-
-    ![efs-access-policy](assets/efs-access-policy.png)
-
-5. Review the values provided and create the EFS.
 
 
 ## Setting up the SECONDARY Region (us-west-2)
@@ -92,16 +89,19 @@ Create the efs-secondary SecurityGroup and set proper inbound/outbound rules. Fo
 
 ## 4. EFS-Secondary
 
-> [!IMPORTANT]
-> File system protection should be enabled for EFS-Primary and disabled for EFS-Secondary. This is a requirement to turn on replication.
-
 1. Specify the general settings, similar to EFS-Primary.
 
 2. Specify the mount targets. You should select the OpenShift-Secondary VPC and private subnets. Use efs-secondary for SecurityGroup.
 
     ![efs-mount-targets](assets/efs-mount-targets-secondary.png)
 
-3. Configure the EFS default access point
+3. Specify the file system [access policy](scripts/efs-policy-secondary.json). The `aws:SourceIp` must contain at least the CIDR of OpenShift-Secondary; and any other IP ranges from which the EFS instance will be accessed from.
+
+    ![efs-access-policy](assets/efs-access-policy-secondary.png)
+
+4. Review the values provided and create the EFS.
+
+5. Configure the EFS default access point
 
     > [!IMPORTANT]
     > `POSIX User` and `Root directory creation permissions` should match what's in the screenshot below for apps running on OpenShift to be able to read/write to EFS. You may apply more restrictions by setting UID and GID to specific numbers other than zero (0), apps accessing the share will have to be configured to run as these UIDs and GIDs.
@@ -111,14 +111,10 @@ Create the efs-secondary SecurityGroup and set proper inbound/outbound rules. Fo
     ![efs-access-point](assets/efs-secondary-ap.png)
 
 
-4. Specify the file system [access policy](scripts/efs-policy-secondary.json). The `aws:SourceIp` must contain at least the CIDR of OpenShift-Secondary; and any other IP ranges from which the EFS instance will be accessed from.
-
-    ![efs-access-policy](assets/efs-access-policy-secondary.png)
-
-5. Review the values provided and create the EFS.
-
-
 ## Enable EFS-Primary to EFS-Secondary data replication
+
+> [!IMPORTANT]
+> File system protection should be enabled for EFS-Primary and disabled for EFS-Secondary. This is a requirement to turn on replication.
 
 1. Open the EFS-Primary instance and click on the **Replication** tab.
 
@@ -135,15 +131,15 @@ Create the efs-secondary SecurityGroup and set proper inbound/outbound rules. Fo
 
 ## Bastion/CICD Hosts
 
-Two pipelines are needed to complete the automation of [volume-create](.ci/volume-create.sh) which runs on Bastion-Primary (`us-east-1`); and [volume-recovery](.ci/volume-restore.sh) which runs on Bastion-Secondary (`us-west-2`). However, the need to have two bastion hosts can be avoided if VPC-to-VPC DNS resolution is configured.
+Two pipelines are needed to complete the automation of [volume-create](.ci/volume-create.sh) which runs on Bastion-Primary (`us-east-1`); and [volume-restore](.ci/volume-restore.sh) which runs on Bastion-Secondary (`us-west-2`). However, the need to have two bastion hosts can be avoided if VPC-to-VPC DNS resolution is configured.
 
 For the sake of simplicity of the demo, we'll use two bastion hosts; one for each region.
 
-### Bastion Primary
+### Bastion Primary (`us-east-1`)
 
 1. Select the AMI
 
-    ![bastion-ami](assets/bastion-ami.png)
+    ![bastion-primary-ami](assets/bastion-primary-ami.png)
 
 2. Select VPC and subnet details, I chose public subnets since I need to access the host from the [public] internet (laptop).
 
@@ -155,50 +151,68 @@ For the sake of simplicity of the demo, we'll use two bastion hosts; one for eac
 
     ![bastion-user-data](assets/bastion-user-data.png)
 
-4. Assign an Elastic IP to the host
+4. Click on the **Launch instance** button
 
-    If the bastion need to be accessed from the public internet, such as my workstation, create an elastic IP instance and assign it to the EC2 instance; this allow us to have a sticky public IP address that does not change between EC2 reboots.
+
+5. Assign an Elastic IP to the host
+
+    If the bastion need to be accessed from the public internet, such as a workstation, create an elastic IP instance and assign it to the EC2 instance; this allow the bastion to have a sticky public IP address that does not change between EC2 reboots.
+
+    ![bastion-primary-eip-create](assets/bastion-primary-eip-create.png)
 
     ![bastion-elastic-ip-search](assets/bastion-elastic-ip-search.png)
 
-    ![bastion-elastic-ip](assets/bastion-elastic-ip.png)
 
-5. Verify the bastion host has all required programs
+6. Verify the bastion host has all required programs
 
     To login, use the ec2 key-pair you downloaded during the EC2 launch step.
 
     ```sh
-    chmod 400 /path/to/bastion-primary.pem
-    ssh -i /path/to/bastion-primary.pem ec2-user@x.x.x.x
+    # Copy bastion-primary.pem to local .ssh directory
+    cp ~/Downloads/bastion-primary.pem .ssh/
+    chmod 400 .ssh/bastion-primary.pem
+    ```
+
+    ```sh
+    # Login to bastion-primary
+    ssh -i .ssh/bastion-primary.pem ec2-user@<public_ip>
     ```
 
     ![bastion-programs-check](assets/bastion-programs-check.png)
 
-6. Confirm the EFS instance can be reached from the bastion host
+7. Confirm the EFS instance can be reached from the bastion host
 
+    ```sh
+    whoami
+    mkdir efs
+    sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com:/ efs
+    ```
     ![bastion-efs-mount-check](assets/bastion-efs-mount-check.png)
 
-7. Verify network connectivity between Bastion-Primary, OpenShift-Primary and EFS-Primary
+8. Verify network connectivity between Bastion-Primary, OpenShift-Primary and EFS-Primary
 
     Verify the network paths are open:
 
       - OpenShift-Primary (from node terminal) to EFS-Primary
 
         ```sh
-        ncat -z -v fs-xxxxxxxxxxxxx.efs.us-east-1.amazonaws.com 2049
+        ncat -z -v fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com 2049
         ```
+        ![openshift-primary-efs-network-check](assets/openshift-primary-efs-network-check.png)
+        
 
       - Bastion-Primary to EFS-Primary
 
         ```sh
-        ncat -z -v fs-xxxxxxxxxxxxx.efs.us-east-1.amazonaws.com 2049
+        ncat -z -v fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com 2049
         ```
+        ![openshift-secondary-efs-network-check](assets/openshift-secondary-efs-network-check.png)
 
-### Bastion Secondary
+### Bastion Secondary (`us-west-2`)
 
 The Bastion-Secondary is launched within the OpenShift-Secondary VPC.
 
-Repeat the same steps as described for in [Bastion-Primary](#bastion-primary)
+Repeat the same steps as described for [Bastion-Primary](#bastion-primary-us-east-1)
 
 
 ## Git Repository Setup
@@ -216,7 +230,7 @@ Before proceeding further, fork this repository into your own personal github/gi
     # Note the url will change in your case
     git clone https://github.com/luqmanbarry/regional-dr-with-aws-efs.git
     # You will be prompted for username and password.
-    > username: <git>
+    > username: git
     > password: <PAT>
     ```
 
@@ -257,6 +271,7 @@ Since the process handles one volume (PV-PVC) provisioning per run, we'll need o
 
     # BU & App & PV Info
     export business_unit="sales"
+    export cluster_name="rosa-primary"
     export application_name="shipping"
     export namespace="shipping-dev"
     export pvc_name="shipping-dev2"
@@ -282,7 +297,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 1. Login to Bastion-Primary
 
     ```sh
-    ssh -i .ssh/bastion-primary.pem ec2-user@52.21.22.18
+    ssh -i .ssh/bastion-primary.pem ec2-user@34.199.80.81
     ```
 
 2. Set user inputs
@@ -300,11 +315,14 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
+    # OpenShift-Primary Cluster Name
+    export cluster_name="rosa-primary"
     # OpenShift-Primary Login Command
     export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
 
     # BU & App & PV Info
     export business_unit="sales"
+    export cluster_name="rosa-primary"
     export application_name="warehouse"
     export namespace="warehouse-dev"
     export pvc_name="warehouse-store"
@@ -351,6 +369,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     # BU & App & PV Info
     export business_unit="sales"
+    export cluster_name="rosa-primary"
     export application_name="point-of-sale"
     export namespace="point-of-sale"
     export pvc_name="point-of-sale"
@@ -396,6 +415,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     # BU & App & PV Info
     export business_unit="sales"
+    export cluster_name="rosa-primary"
     export application_name="shipping"
     export namespace="shipping-dev"
     export pvc_name="shipping-dev"
@@ -557,6 +577,8 @@ As the failover will take place in the secondary region (`us-west-2`), in a diff
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
+    # Restore From Cluster Name
+    export cluster_name="rosa-primary"
     # OpenShift-Secondary Login Command
     export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-secondary.x1x2x.p1.openshiftapps.com:6443'
     ```
