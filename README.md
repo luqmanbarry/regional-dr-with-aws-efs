@@ -25,7 +25,7 @@ If you need a refresher on the topic of "Disaster Recovery" in the cloud, I sugg
 
 ## Solution Overview
 
-![regional-dr-efs-architecture.jpg](assets/regional-dr-efs-architecture-v2.jpg)
+![regional-dr-efs-architecture.jpg](assets/regional-dr-efs-architecture-v3.jpg)
 
 We'll discuss the solution in two phases, before and after the disaster.
 
