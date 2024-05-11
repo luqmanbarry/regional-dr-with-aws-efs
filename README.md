@@ -102,7 +102,7 @@ At a higher level, the procedure would look like this:
 
 ### Procedure
 
-Implementation steps are covered in more detail [hre](https://github.com/luqmanbarry/regional-dr-with-aws-efs/blob/main/Implementation.md).
+Implementation steps are covered in more detail [here](https://github.com/luqmanbarry/regional-dr-with-aws-efs/blob/main/Implementation.md).
 
 ## Conclusion
 
