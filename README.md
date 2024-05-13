@@ -23,6 +23,11 @@ This solution may be applied to any of the following scenarios:
 
 If you need a refresher on the topic of "Disaster Recovery" in the cloud, I suggest you read [this article](https://aws.amazon.com/what-is/disaster-recovery/) from AWS.
 
+
+## Security Best Practices
+
+AWS EFS is a shared storage; hence best security practices such as [File Permissions](https://docs.aws.amazon.com/efs/latest/ug/accessing-fs-nfs-permissions.html) and [Access Policies](https://docs.aws.amazon.com/efs/latest/ug/security-iam.html) must be applied to the EFS instance to ensure only team members with elevated privileges can access all of the data in store. For example, we could limit specific types of access to certain IP ranges, AWS Principals, Roles..etc. 
+
 ## Solution Overview
 
 ![regional-dr-efs-architecture.jpg](assets/regional-dr-efs-architecture-v4.jpg)
