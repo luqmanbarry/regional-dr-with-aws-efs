@@ -25,7 +25,7 @@ If you need a refresher on the topic of "Disaster Recovery" in the cloud, I sugg
 
 ## Solution Overview
 
-![regional-dr-efs-architecture.jpg](assets/regional-dr-efs-architecture-v3.jpg)
+![regional-dr-efs-architecture.jpg](assets/regional-dr-efs-architecture-v4.jpg)
 
 We'll discuss the solution in two phases, before and after the disaster.
 
@@ -81,13 +81,13 @@ In contrast, the recovery phase is when the Secondary region takes over and beco
 At a higher level, the procedure would look like this:
 
 1. Provision OpenShift-Secondary in Region B - If not provisioned already.
-2. Integrate OpenShift-Secondary with EFS-Secondary instance - if not done already.
+2. Integrate OpenShift-Secondary with the EFS-Secondary instance - if not done already.
 
   - Network connectivity verification
-  - Enable dynamic volume provisioning as well, [configure](https://cloud.redhat.com/experts/rosa/aws-efs/) the AWS EFS CSI Driver Operator. Keep in mind that dynamic volumes are not supported by this solution.
+  - Dynamic volume provisioning can be [enabled](https://cloud.redhat.com/experts/rosa/aws-efs/) as well. However, they should be used for non-critical workloads that do not require regional disaster recovery.
 3. Run the [volume-restore](.ci/volume-restore.sh) pipeline to restore static volumes onto OpenShift-Secondary.
 
-    This process will scan the `<playbook-dir>/PV-PVCs/primary/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/*`.
+    This process will scan the `<playbook-dir>/PV-PVCs/primary/<cluster_name>/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/<cluster_name>*`. `cluster_name` is the name of the primary cluster.
 
 4. Redeploy your applications onto OpenShift-Secondary.
 5. Reroute network traffic to the Secondary region.
