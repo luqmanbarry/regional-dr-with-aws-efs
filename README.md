@@ -50,7 +50,7 @@ At a higher level, the procedure would look like this:
 6. If you intend to enable dynamic volume provisioning as well, [configure](https://cloud.redhat.com/experts/rosa/aws-efs/) the AWS EFS CSI Driver Operator. Keep in mind that dynamic volumes are not supported by this solution.
 7. Implement the automation process (ie: Ansible...etc) for tenants (app teams) to request static persistent volumes on OpenShift-Primary.
 
-    The [volume-create](./volume-create.yaml) playbook works as follows:
+    The [volume-create.yaml](./volume-create.yaml) playbook works as follows:
     - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
     - Validate user inputs for character lengths, OpenShift cluster-admin permission, ...etc.
     - Create the volume directory tree as: `/<prefix>/<business_unit>/<cluster_name>/<application_name>/<namespace>/<pvc_name>`.
@@ -58,10 +58,10 @@ At a higher level, the procedure would look like this:
     - Apply the PV/PVC manifest to OpenShift-Primary; the namespace will be created if it does not exist.
     - Commit and push the PV/PVC manifest to a git SCM.
       - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/primary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
-    - Wrap the [volume-create](.ci/volume-create.sh) process into a proper CI pipeline with user inputs provided in the form of job parameters.
+    - Wrap the [volume-create.sh](.ci/volume-create.sh) process into a proper CI pipeline with user inputs provided in the form of job parameters.
 8. Implement the automation process (ie: Ansible..etc) for restoring the static volumes on OpenShift-Secondary.
 
-    The [volume-restore](./volume-restore.yaml) playbook works as follows:
+    The [volume-restore.yaml](./volume-restore.yaml) playbook works as follows:
 
      - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, dest_efs_hostname, ocp_login_command
      - Stop the EFS replication and wait until EFS-Secondary is write-enabled.
@@ -69,9 +69,9 @@ At a higher level, the procedure would look like this:
      - Apply the secondary PV/PVC manifests on OpenShit-Secondary.
      - Commit the secondary PV/PVC manifests to git SCM.
        - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/secondary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
-     - Wrap the [volume-restore](.ci/volume-restore.sh) process into a proper CI pipeline with user inputs provided as job parameters.
+     - Wrap the [volume-restore.sh](.ci/volume-restore.sh) process into a proper CI pipeline with user inputs provided as job parameters.
 
-9. Run [volume-create](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.
+9. Run [volume-create.sh](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.
 10. Deploy a few [sample stateful](./sample-apps/) (with static volumes) on OpenShift-Primary.
 
 ### Phase II: Post-Disaster (Disaster Recovery)
@@ -95,14 +95,15 @@ At a higher level, the procedure would look like this:
 ## Implementation
 
 ### Pre-requisites
-- AWS Account(s)
+- Basic understanding of NFS, AWS, OpenShift.
+- AWS Account
 - Permission to create and replicate EFS services
 - Two ROSA clusters, primary and secondary
-- Bastion host with software packages: python3.11, python3.11-pip, ansible, aws-cli-v2, nfs-utils, nmap, unzip, openshift-cli. 
+- Bastion host(s) with software packages: python3.11, python3.11-pip, ansible, aws-cli-v2, nfs-utils, nmap, unzip, openshift-cli. 
 
 ### Procedure
 
-Implementation steps are covered in more detail [here](https://github.com/luqmanbarry/regional-dr-with-aws-efs/blob/main/Implementation.md).
+TL;DR; implementation steps are covered in more detail [here](./Implementation.md).
 
 ## Conclusion
 
