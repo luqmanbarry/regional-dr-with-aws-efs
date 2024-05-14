@@ -5,13 +5,15 @@
 
 Disaster ranges from mistakenly deleting data to an entire cloud region or critical service within that region being down. There are many commercial and freemium solutions offerings around this business need.
 
-In the event of a disaster, one question customers often ask is "How do I make sure business can resume as quickly as possible with the least amount of downtime and data loss".
+In the event of a disaster, one question customers often ask is “How do I make sure business can resume as quickly as possible with the least amount of downtime and data loss?”.
+This article attempts to demonstrate an approach to solving this problem in a manner that is low-cost yet effective; using static volume provisioning with RedHat OpenShift on AWS (ROSA) and AWS EFS.
 
-This article attempts to demonstrate an approach to solving this problem in a manner that is low-cost yet effective; using static volume provisioning with RedHat OpenShift on AWS (ROSA) and AWS EFS. 
+In the grand scheme of disaster recovery, replication of persistent volumes data alone is incomplete when we take a holistic view of all other services applications need to interact with to fully function. For example, one application may need to communicate with a third-arty vendor API, a data store service such as AWS RDS, an application running on a VM…etc. Some if not all of the other critical dependencies need to be taken into account when designing a regional DR plan.
 
-The solution works best for workloads with storage performance requirements that can be satisfied with NFS. 
+The solution works best for workloads with storage performance requirements that can be satisfied with NFS.
 
 This solution may be applied to any of the following scenarios:
+
 
 - Data protection
 - Application migration
@@ -26,7 +28,10 @@ If you need a refresher on the topic of "Disaster Recovery" in the cloud, I sugg
 
 ## Security Best Practices
 
-AWS EFS is a shared storage; hence best security practices such as [File Permissions](https://docs.aws.amazon.com/efs/latest/ug/accessing-fs-nfs-permissions.html) and [Access Policies](https://docs.aws.amazon.com/efs/latest/ug/security-iam.html) must be applied to the EFS instance to ensure only team members with elevated privileges can access all of the data in store. For example, we could limit specific types of access to certain IP ranges, AWS Principals, Roles..etc. 
+AWS EFS is a shared storage service (NFS); hence it is imperative that best security practices such as [File Permissions](https://docs.aws.amazon.com/efs/latest/ug/accessing-fs-nfs-permissions.html) and [Access Policies](https://docs.aws.amazon.com/efs/latest/ug/security-iam.html) be applied to the EFS instance to ensure application teams are able to access their assigned directories; and only team members with elevated privileges can access the entire EFS directory tree. For example, we could limit specific types of access to certain IP ranges, AWS Principals, Roles..etc. 
+
+In the implementation section of this article, I used slightly relaxed policies; however, in a production environment, one should apply even more restrictive policies while ensuring data access by application teams is not hindered.
+
 
 ## Solution Overview
 
@@ -92,7 +97,7 @@ At a higher level, the procedure would look like this:
   - Dynamic volume provisioning can be [enabled](https://cloud.redhat.com/experts/rosa/aws-efs/) as well. However, they should be used for non-critical workloads that do not require regional disaster recovery.
 3. Run the [volume-restore](.ci/volume-restore.sh) pipeline to restore static volumes onto OpenShift-Secondary.
 
-    This process will scan the `<playbook-dir>/PV-PVCs/primary/<cluster_name>/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/<cluster_name>*`. `cluster_name` is the name of the primary cluster.
+    This process will scan the `<playbook-dir>/PV-PVCs/primary/<cluster_name>/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/<cluster_name>*`. `cluster_name` is the name of the primary cluster. `cluster_name` is the name of the primary cluster.
 
 4. Redeploy your applications onto OpenShift-Secondary.
 5. Reroute network traffic to the Secondary region.
