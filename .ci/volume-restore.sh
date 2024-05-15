@@ -15,9 +15,9 @@ echo '******  Launch the Ansible Virtual Environment  ********'
 echo '********************************************************'
 echo
 
-.env/setup.sh
+. .env/setup.sh
 
-echo ". \"$(pwd)/$ENV_DIR/bin/activate\" || echo 'Failed to enter virtual environment' && exit 1"
+# echo ". $(pwd)/$ENV_DIR/bin/activate || echo 'Failed to enter virtual environment'"
 
 echo '********************************************************'
 echo '**********  Ansible: Initiate Volume Restore  **********'

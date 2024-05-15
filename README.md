@@ -8,13 +8,13 @@ Disaster ranges from mistakenly deleting data to an entire cloud region or criti
 In the event of a disaster, one question customers often ask is “How do I make sure business can resume as quickly as possible with the least amount of downtime and data loss?”.
 This article attempts to demonstrate an approach to solving this problem in a manner that is low-cost yet effective; using static volume provisioning with RedHat OpenShift on AWS (ROSA) and AWS EFS.
 
-In the grand scheme of disaster recovery, replication of persistent volumes data alone is incomplete when we take a holistic view of all other services applications need to interact with to fully function. For example, one application may need to communicate with a third-arty vendor API, a data store service such as AWS RDS, an application running on a VM…etc. Some if not all of the other critical dependencies need to be taken into account when designing a regional DR plan.
+In the grand scheme of disaster recovery, replication of persistent volumes alone is not enough when we take a holistic view of all other services applications need to interact with to fully function. For example, one application may need to communicate with a third-party vendor API, a data store service such as AWS RDS, an application running on a VM…etc. Some if not all of the other critical dependencies need to be taken into account when designing a regional DR plan.
 
 The solution works best for workloads with storage performance requirements that can be satisfied with NFS.
 
 This solution may be applied to any of the following scenarios:
 
-
+A&WapySjHT4S@0n4WS8
 - Data protection
 - Application migration
 - Data proximity, exposing read-only data to workloads deployed in other regions

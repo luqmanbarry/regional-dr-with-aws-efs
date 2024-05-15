@@ -5,7 +5,7 @@ echo '*****************  VOLUME CREATE  **********************'
 echo '********************************************************'
 echo
 
-ENV_DIR=".ansible-venv"
+export ANSIBLE_ENV_DIR=".ansible-venv"
 
 # . .ci/admin-inputs.sh
 # . .ci/user-inputs.sh
@@ -15,9 +15,9 @@ echo '******  Launch the Ansible Virtual Environment  ********'
 echo '********************************************************'
 echo
 
-.env/setup.sh
+. .env/setup.sh
 
-echo ". \"$(pwd)/$ENV_DIR/bin/activate\" || echo 'Failed to enter virtual environment' && exit 1"
+# echo ". $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter virtual environment'"
 
 echo '********************************************************'
 echo '**********  Ansible: Initiate Volume Create  ***********'
