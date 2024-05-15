@@ -1,6 +1,12 @@
 #!/bin/bash
 
 ACTION="$1"
+
+if [ "$ACTION" = "-h" ] || [ "$ACTION" = "--help" ];
+then
+  echo "Example Call: . .env/setup.sh"
+fi
+
 export ANSIBLE_ENV_DIR=".ansible-venv"
 
 
@@ -22,8 +28,8 @@ then
   echo "Current Directory: $(pwd)"
   echo "Current Directory Content: $(ls -latr)"
 
-  echo "deactivate || true"
-  echo ". \"$(pwd)/$ANSIBLE_ENV_DIR/bin/activate\" || echo 'Failed to enter virtual environment' && exit 1"
+  deactivate || echo "Ansible Virtual Environment not active"
+  . $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
 
   pip3.11 install -U \
     ansible \
@@ -48,4 +54,5 @@ then
   ansible-galaxy collection list ansible.posix
 fi
 
-. $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter virtual environment'
+deactivate || echo "Ansible Virtual Environment not active"
+. $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to activate Ansible Virtual Environment'
