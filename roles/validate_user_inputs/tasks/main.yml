@@ -156,6 +156,12 @@
             - ansible.builtin.set_fact:
                 pv_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolume', resource_name=__pv_name) }}"
                 pvc_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolumeClaim', namespace=__pvc_namespace, resource_name=pvc_name) }}"
+            
+            - name: "Input Validation: Fail if pv_lookup result is not empty"
+              ansible.builtin.fail:
+                msg: "The requested PersistentVolume ('{{ __pv_name }}') exists already."
+              when: >
+                pv_lookup is defined and pv_lookup | length > 0
 
             - name: "Input Validation: Fail if pvc_lookup result is not empty"
               ansible.builtin.fail:
