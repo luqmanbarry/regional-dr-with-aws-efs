@@ -304,15 +304,15 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     ```sh
     # AWS AuthN
-    export AWS_ACCESS_KEY_ID="AK0123456789O6IZCFOC"
-    export AWS_SECRET_ACCESS_KEY="W8Qgme0123456789125v1disbENVU5K6KaDctJU4"
+    export AWS_ACCESS_KEY_ID="AKIAZL2555555FVBJPEFR"
+    export AWS_SECRET_ACCESS_KEY="F2TrALPHMuuhuxOmS8fQsoLSrd4E57TD8AAAnilt"
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-0d5c0680cbecadb22.efs.us-east-1.amazonaws.com"
+    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
-    export pv_git_commit_token="github_pat_11ADFZ6PQ06ucElMufGKGt_iBriI012345678901234567890123456789AUlU3TdP43W6L6IA7jjyq2T4"
+    export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
     # OpenShift-Primary Login Command
@@ -332,7 +332,12 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 3. Run the volume provisioning job
 
     ```sh
+    # Load Ansible Virtual Environment
+    . .env/setup.sh
+    # Run pipeline script
     .ci/volume-create.sh
+    # Exit Ansible Virtual Environment
+    deactivate || true
     ```
 
     After job execution, the persistent volumes should show up in the OpenShift-Primary cluster.
@@ -379,7 +384,12 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 3. Run the volume provisioning job
 
     ```sh
+    # Load Ansible Virtual Environment
+    . .env/setup.sh
+    # Run pipeline script
     .ci/volume-create.sh
+    # Exit Ansible Virtual Environment
+    deactivate || true
     ```
     After job execution, the persistent volumes should show up in the OpenShift-Primary cluster.
 
@@ -424,7 +434,12 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 3. Run the volume provisioning job
 
     ```sh
+    # Load Ansible Virtual Environment
+    . .env/setup.sh
+    # Run pipeline script
     .ci/volume-create.sh
+    # Exit Ansible Virtual Environment
+    deactivate || true
     ```
 
     After job execution, the persistent volumes should show up in the OpenShift-Primary cluster.

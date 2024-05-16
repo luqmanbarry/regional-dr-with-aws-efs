@@ -7,11 +7,11 @@ then
   echo "Example Call: . .env/setup.sh"
 fi
 
-export ANSIBLE_ENV_DIR=".ansible-venv"
+export ANSIBLE_ENV_DIR="$(pwd)/.ansible-venv"
 
 
 # Validate Inputs are provided
-if ! test -f $ANSIBLE_ENV_DIR/bin/activate ;
+if ! test -f ${ANSIBLE_ENV_DIR}/bin/activate ;
 then
   # ln -s /usr/bin/python3.11 /usr/bin/python
   # ln -s /usr/bin/python3.11 /usr/bin/python3
@@ -20,16 +20,16 @@ then
   pip3.11 --version
   pip3.11 install --user virtualenv
 
-  virtualenv $ANSIBLE_ENV_DIR
+  virtualenv ${ANSIBLE_ENV_DIR}
   
   echo "Created virtual environment: "
-  ls -latr $ANSIBLE_ENV_DIR
-  ls -latr $ANSIBLE_ENV_DIR/bin
+  ls -latr ${ANSIBLE_ENV_DIR}
+  ls -latr ${ANSIBLE_ENV_DIR}/bin
   echo "Current Directory: $(pwd)"
   echo "Current Directory Content: $(ls -latr)"
 
   deactivate || echo "Ansible Virtual Environment not active"
-  . $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
+  . ${ANSIBLE_ENV_DIR}/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
 
   pip3.11 install -U \
     ansible \
@@ -55,4 +55,4 @@ then
 fi
 
 deactivate || echo "Ansible Virtual Environment not active"
-. $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to activate Ansible Virtual Environment'
+. ${ANSIBLE_ENV_DIR}/bin/activate || echo 'Failed to enter Ansible Virtual Environment'

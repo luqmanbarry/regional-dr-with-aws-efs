@@ -15,8 +15,6 @@ echo '******  Launch the Ansible Virtual Environment  ********'
 echo '********************************************************'
 echo
 
-. .env/setup.sh
-
 # echo ". $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter virtual environment'"
 
 echo '********************************************************'
