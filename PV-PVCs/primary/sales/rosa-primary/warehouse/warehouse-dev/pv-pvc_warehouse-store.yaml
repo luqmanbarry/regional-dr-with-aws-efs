@@ -22,7 +22,7 @@ spec:
     - sync
   nfs:
     path: "/k8s-static-volumes/sales/warehouse/warehouse-dev/"
-    server: "fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    server: "fs-01db3de96fa87769b.efs.us-east-1.amazonaws.com"
     readOnly: false
   persistentVolumeReclaimPolicy: Retain
 ---
