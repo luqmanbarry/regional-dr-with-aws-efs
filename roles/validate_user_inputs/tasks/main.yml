@@ -146,17 +146,25 @@
               - pvc_size | int > 0
             fail_msg: "'pvc_size' must be greater than zero (0)"
             success_msg: "'pvc_size' value is '{{ pvc_size }}'"
-
+        
         - name: "Input Validation: Fail if PVC exists already"
           block:
-            - set_fact:
-                pvc_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolumeClaim', namespace=pvc_name) }}"
+            - ansible.builtin.set_fact:
+                __pvc_namespace: "{{ namespace }}"
+                __pv_name : "{{ business_unit }}.{{ application_name }}.{{ namespace }}.{{ pvc_name }}"
+
+            - ansible.builtin.set_fact:
+                pv_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolume', resource_name=__pv_name) }}"
+                pvc_lookup: "{{ query('kubernetes.core.k8s', kubeconfig=kconfig ,kind='PersistentVolumeClaim', namespace=__pvc_namespace, resource_name=pvc_name) }}"
 
             - name: "Input Validation: Fail if pvc_lookup result is not empty"
               ansible.builtin.fail:
                 msg: "The requested PersistentVolumeClaim ('{{ pvc_name }}') exists already."
               when: >
+                pv_lookup is defined and pv_lookup | length > 0
+                or
                 pvc_lookup is defined and pvc_lookup | length > 0
+
           when: volume_create_strict_mode == true
       when: "'CREATE' in volume_dr_mode"
         
