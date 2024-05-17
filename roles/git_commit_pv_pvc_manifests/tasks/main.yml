@@ -33,9 +33,10 @@
 
     - name: "Git: Commit volume manifests to git repository"
       ansible.builtin.shell: |
+        git status
         git fetch
         git pull
-        git add -A
+        git add .
         git commit -am {{ commit_message }}
         git push {{ git_remote_name }} {{ git_branch }}
       args:
