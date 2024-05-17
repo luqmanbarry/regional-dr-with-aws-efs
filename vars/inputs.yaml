@@ -1,8 +1,12 @@
 # USER INPUTS
 src_nfs_mount_directory: "{{ playbook_dir }}/efs-mount/src"
-src_efs_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
 dest_nfs_mount_directory: "{{ playbook_dir }}/efs-mount/dest"
-dest_efs_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
+
+efs_primary_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
+efs_secondary_hostname: "fs-xxxxxxxxx.efs.us-east-1.amazonaws.com"
+
+ocp_primary_login_command: "oc login --token=<value> --server=<value>"
+ocp_secondary_login_command: "oc login --token=<value> --server=<value>"
 # efs_root_access_point: "fsap-01fbbe137b15eb957" # Permission: uid(65534),gid(0),second-gid(0,65534)
 efs_volumes_root_dir: "/k8s-static-volumes" # EFS AccessPoint directory
 # volume_dr_mode: 'CREATE' #Options: CREATE|RESTORE
