@@ -24,6 +24,7 @@
 
     - role: git_commit_pv_pvc_manifests
       gather_facts: false
+      volume_dr_mode: 'CREATE'
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
       
     - role: apply_pv_pvc_manifests

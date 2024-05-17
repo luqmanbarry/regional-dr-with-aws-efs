@@ -7,6 +7,9 @@
         git_remote_name: "pv-remote"
         git_branch: "{{ pv_git_commit_branch }}"
         git_remote_url: "https://{{ pv_git_commit_username }}:{{ pv_git_commit_token }}@{{ pv_git_commit_repository | replace('https://', '') | replace('http://', '') }}"
+        commit_message: "Volume {{ volume_dr_mode | capitalize }} for application: '{{ business_unit }}/{{ ocp_primary_cluster_name }}/{{ application_name }}'"
+
+    
 
     - name: "Git: Set remote git-url"
       ansible.builtin.shell: |
@@ -33,7 +36,7 @@
         git fetch
         git pull
         git add -A
-        git commit -m "Volume manifests for application: '{{ business_unit }}/{{ ocp_primary_cluster_name }}/{{ application_name }}'"
+        git commit -am {{ commit_message }}
         git push {{ git_remote_name }} {{ git_branch }}
       args:
         chdir: "{{ pv_git_commit_dir }}"
