@@ -7,8 +7,7 @@
         git_remote_name: "pv-remote"
         git_branch: "{{ pv_git_commit_branch }}"
         git_remote_url: "https://{{ pv_git_commit_username }}:{{ pv_git_commit_token }}@{{ pv_git_commit_repository | replace('https://', '') | replace('http://', '') }}"
-        commit_message: "Volume {{ volume_dr_mode | capitalize }} for application: '{{ business_unit }}/{{ ocp_primary_cluster_name }}/{{ application_name }}'"
-
+        commit_message: "Volume {{ volume_dr_mode | capitalize }} for cluster: '{{ ocp_primary_cluster_name }}'"
     
 
     - name: "Git: Set remote git-url"

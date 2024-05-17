@@ -22,6 +22,7 @@ ansible-playbook volume-restore.yaml \
   -e @vars/inputs.yaml \
   -e "pv_git_commit_token=\"$pv_git_commit_token\"" \
   -e "pv_git_commit_repository=\"$pv_git_commit_repository\"" \
+  -e "ocp_primary_cluster_name=\"$ocp_primary_cluster_name\"" \
   -e "ocp_secondary_login_command=\"$ocp_secondary_login_command\"" \
   -e "efs_primary_hostname=\"$efs_primary_hostname\"" \
   -e "efs_secondary_hostname=\"$efs_secondary_hostname\"" \
