@@ -45,13 +45,8 @@ then
 
   ansible --version
 
-  ansible-galaxy collection install kubernetes.core
-  ansible-galaxy collection install  community.general
-  ansible-galaxy collection install  ansible.posix
-  
-  ansible-galaxy collection list community.general
-  ansible-galaxy collection list kubernetes.core
-  ansible-galaxy collection list ansible.posix
+  ansible-galaxy collection install -r .env/requirements.yaml
+
 fi
 
 deactivate || echo "Ansible Virtual Environment not active"
