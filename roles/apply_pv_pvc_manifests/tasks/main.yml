@@ -90,6 +90,10 @@
         state: absent
         template: "{{ __mount_testPod_template }}"
         kubeconfig: "{{ kconfig }}"
+    
+    - name: "Apply PV/PVC: Wait for test pods to completely shut down"
+      ansible.builtin.wait_for:
+        timeout: 60
 
     - name: "Apply PV/PVC: Get mount-test directory listing"
       ansible.builtin.find:
@@ -115,6 +119,8 @@
         path: "{{ __local_mount_test_dir }}" 
         state: absent
       become: true
+      retries: 10
+      delay: 10
 
   ignore_errors: false
   always:
