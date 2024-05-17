@@ -21,6 +21,7 @@ then
   pip3.11 install --user virtualenv
 
   virtualenv ${ANSIBLE_ENV_DIR}
+  chmod -R 777 ${ANSIBLE_ENV_DIR}
   
   echo "Created virtual environment: "
   ls -latr ${ANSIBLE_ENV_DIR}
