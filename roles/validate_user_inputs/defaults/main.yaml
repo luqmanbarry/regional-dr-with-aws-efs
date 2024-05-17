@@ -1,5 +1,5 @@
 business_unit: "" # get-from-env
-cluster_name: "" # get-from-env
+ocp_primary_cluster_name: "" # get-from-env
 application_name: "" # get-from-env
 namespace: "" # get-from-env
 pvc_name: "" # get-from-env

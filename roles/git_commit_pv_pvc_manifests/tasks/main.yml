@@ -33,7 +33,7 @@
         git fetch
         git pull
         git add -A
-        git commit -m "Volume manifests for application: '{{ business_unit }}/{{ cluster_name }}/{{ application_name }}'"
+        git commit -m "Volume manifests for application: '{{ business_unit }}/{{ ocp_primary_cluster_name }}/{{ application_name }}'"
         git push {{ git_remote_name }} {{ git_branch }}
       args:
         chdir: "{{ pv_git_commit_dir }}"

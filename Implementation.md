@@ -79,6 +79,10 @@ Based on RPO, RTO and cost constraints, one may choose to hold off the provision
 
 For the purpose of being able to follow the guide, both OpenShift-Primary and OpenShift-Secondary need to be created before moving on.
 
+Here's my RedHat cloud console dashboard, as show I have two clusters running, one for each region.
+
+![rosa-cluster-ocm](assets/rosa-clusters-ocm.png)
+
 ## 3. SecurityGroup for NFS traffic (efs-secondary)
 
 Create the efs-secondary SecurityGroup and set proper inbound/outbound rules. For inbound, I allowed NFS traffic from OpenShift-Secondary VPC. Since the bastion host is deployed within the VPC, one rule sufficed. Add more inbound/outbound rules based on your situation.
@@ -271,7 +275,7 @@ Since the process handles one volume (PV-PVC) provisioning per run, we'll need o
 
     # BU & App & PV Info
     export business_unit="sales"
-    export cluster_name="rosa-primary"
+    export ocp_primary_cluster_name="rosa-primary"
     export application_name="shipping"
     export namespace="shipping-dev"
     export pvc_name="shipping-dev2"
@@ -325,7 +329,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     # BU & App & PV Info
     export business_unit="sales"
-    export cluster_name="rosa-primary"
+    export ocp_primary_cluster_name="rosa-primary"
     export application_name="warehouse"
     export namespace="warehouse-dev"
     export pvc_name="warehouse-store"
@@ -377,7 +381,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     # BU & App & PV Info
     export business_unit="sales"
-    export cluster_name="rosa-primary"
+    export ocp_primary_cluster_name="rosa-primary"
     export application_name="point-of-sale"
     export namespace="point-of-sale"
     export pvc_name="point-of-sale"
@@ -407,7 +411,6 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     ```sh
     ssh -i .ssh/bastion-primary.pem ec2-user@52.21.22.18
     ```
-
 2. Set user inputs
 
     ```sh
@@ -428,7 +431,7 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
 
     # BU & App & PV Info
     export business_unit="sales"
-    export cluster_name="rosa-primary"
+    export ocp_primary_cluster_name="rosa-primary"
     export application_name="shipping"
     export namespace="shipping-dev"
     export pvc_name="shipping-dev"
@@ -559,7 +562,7 @@ Up to this point we've provisioned three persistent volumes in different namespa
     helm template volumes-dr-demo ./sample-apps | oc apply -f -
     ```
 
-2. Summary of the amount data written to EFS-Primary so far
+2. Summary of the amount data written to EFS-Primary
 
     I have left the apps running for 24 hours and here's the amount of data written to EFS-Primary so far.
 
@@ -573,6 +576,7 @@ Up to this point we've provisioned three persistent volumes in different namespa
 
     ![shipping-data](assets/shipping-data.png)
 
+This concludes the Pre-Disaster phase demo. Next, we'll try to access this data from the `us-west-2` region.
 ---
 
 # Volume Recovery - Regional Failover
@@ -643,7 +647,7 @@ As the failover will take place in the secondary region (`us-west-2`), in a diff
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
     # Restore From Cluster Name
-    export cluster_name="rosa-primary"
+    export ocp_primary_cluster_name="rosa-primary"
     # OpenShift-Secondary Login Command
     export ocp_secondary_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-secondary.x1x2x.p1.openshiftapps.com:6443'
     ```

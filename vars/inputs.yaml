@@ -13,7 +13,7 @@ efs_volumes_root_dir: "/k8s-static-volumes" # EFS AccessPoint directory
 volume_create_strict_mode: false # True means fail if volume exists already; False means otherwise
 
 # business_unit: "get-from-env"
-# cluster_name: "get-from-env"
+# ocp_primary_cluster_name: "get-from-env"
 # application_name: "get-from-env"
 # namespace: "get-from-env"
 # pvc_name: "get-from-env"
@@ -33,7 +33,7 @@ pv_git_commit_token: "take-from-sys-env"
 pv_git_commit_branch: "main"
 pv_git_volume_root_directory: "{{ pv_git_commit_dir }}/PV-PVCs/primary"
 pv_git_volume_restore_root_directory: "{{ pv_git_commit_dir }}/PV-PVCs/secondary"
-pv_git_volume_directory: "{{ pv_git_volume_root_directory }}/{{ business_unit }}/{{ cluster_name }}/{{ application_name }}/{{ namespace }}"
+pv_git_volume_directory: "{{ pv_git_volume_root_directory }}/{{ business_unit }}/{{ ocp_primary_cluster_name }}/{{ application_name }}/{{ namespace }}"
 pv_manifest_file_prefix: "pv-pvc_"
 pv_manifest_filename: "{{ pv_manifest_file_prefix }}{{ pvc_name }}.yaml"
 pv_git_volume_manifest_name: "{{ pv_git_volume_directory }}/{{ pv_manifest_filename }}"

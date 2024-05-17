@@ -26,7 +26,7 @@ ansible-playbook volume-create.yaml \
   -e "ocp_primary_login_command=\"$ocp_primary_login_command\"" \
   -e "efs_primary_hostname=\"$efs_primary_hostname\"" \
   -e "business_unit=\"$business_unit\"" \
-  -e "cluster_name=\"$cluster_name\"" \
+  -e "ocp_primary_cluster_name=\"$ocp_primary_cluster_name\"" \
   -e "application_name=\"$application_name\"" \
   -e "namespace=\"$namespace\"" \
   -e "pvc_name=\"$pvc_name\"" \

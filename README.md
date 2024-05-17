@@ -61,13 +61,13 @@ At a higher level, the procedure would look like this:
 7. Implement the automation process (ie: Ansible...etc) for tenants (app teams) to request static persistent volumes on OpenShift-Primary.
 
     The [volume-create.yaml](./volume-create.yaml) playbook works as follows:
-    - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
+    - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, ocp_primary_cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
     - Validate user inputs for character lengths, OpenShift cluster-admin permission, ...etc.
-    - Create the volume directory tree as: `/<prefix>/<business_unit>/<cluster_name>/<application_name>/<namespace>/<pvc_name>`.
+    - Create the volume directory tree as: `/<prefix>/<business_unit>/<ocp_primary_cluster_name>/<application_name>/<namespace>/<pvc_name>`.
     - Using the predefined PV/PVC template, replace parameters such as <volume_name>, <volume_namespace>, <volume_nfs_server>, <volume_nfs_path>, and save the output manifest to a directory local to the repository.
     - Apply the PV/PVC manifest to OpenShift-Primary; the namespace will be created if it does not exist.
     - Commit and push the PV/PVC manifest to a git SCM.
-      - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/primary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
+      - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/primary/<business_unit>/<ocp_primary_cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
     - Wrap the [volume-create.sh](.ci/volume-create.sh) process into a proper CI pipeline with user inputs provided in the form of job parameters.
 8. Implement the automation process (ie: Ansible..etc) for restoring the static volumes on OpenShift-Secondary.
 
@@ -78,7 +78,7 @@ At a higher level, the procedure would look like this:
      - Recursively scan the PV-PVCs directory, and list all volume manifests used for OpenShift-Primary; for each persistent-volume manifest, replace the EFS-Primary hostname with that of EFS-Secondary.
      - Apply the secondary PV/PVC manifests on OpenShit-Secondary.
      - Commit the secondary PV/PVC manifests to git SCM.
-       - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/secondary/<business_unit>/<cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
+       - PV/PVC manifest file path: `<playbook-dir>/PV-PVCs/secondary/<business_unit>/<ocp_primary_cluster_name>/<application_name>/<namespace>/pv-pvc_<pvc_name>.yaml`
      - Wrap the [volume-restore.sh](.ci/volume-restore.sh) process into a proper CI pipeline with user inputs provided as job parameters.
 
 9. Run [volume-create.sh](.ci/volume-create.sh) pipeline to provision a few persistent volumes on OpenShift-Primary.
@@ -97,7 +97,7 @@ At a higher level, the procedure would look like this:
   - Dynamic volume provisioning can be [enabled](https://cloud.redhat.com/experts/rosa/aws-efs/) as well. However, they should be used for non-critical workloads that do not require regional disaster recovery.
 3. Run the [volume-restore](.ci/volume-restore.sh) pipeline to restore static volumes onto OpenShift-Secondary.
 
-    This process will scan the `<playbook-dir>/PV-PVCs/primary/<cluster_name>/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/<cluster_name>*`. `cluster_name` is the name of the primary cluster. `cluster_name` is the name of the primary cluster.
+    This process will scan the `<playbook-dir>/PV-PVCs/primary/<ocp_primary_cluster_name>/*` directory, create a corresponding PV/PVC for each manifest found; and save the resulting volume manifests in `<playbook-dir>/PV-PVCs/secondary/<ocp_primary_cluster_name>*`. `ocp_primary_cluster_name` is the name of the primary cluster. `ocp_primary_cluster_name` is the name of the primary cluster.
 
 4. Redeploy your applications onto OpenShift-Secondary.
 5. Reroute network traffic to the Secondary region.

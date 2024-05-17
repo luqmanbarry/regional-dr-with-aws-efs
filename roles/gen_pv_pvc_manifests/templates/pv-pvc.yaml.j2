@@ -6,7 +6,7 @@ metadata:
   labels:
     "volume-provision/type": "static"
     "volume-provision/user": "ansible-automation"
-    "volume-provision/owner": "{{ business_unit }}-{{ cluster_name }}-{{ application_name }}"
+    "volume-provision/owner": "{{ business_unit }}-{{ ocp_primary_cluster_name }}-{{ application_name }}"
 spec:
   capacity:
     storage: "{{ pvc_size }}Gi"
@@ -37,7 +37,7 @@ metadata:
   labels:
     "volume-provision/type": "static"
     "volume-provision/user": "ansible-automation"
-    "volume-provision/owner": "{{ business_unit }}-{{ cluster_name }}-{{ application_name }}"
+    "volume-provision/owner": "{{ business_unit }}-{{ ocp_primary_cluster_name }}-{{ application_name }}"
   namespace: "{{ namespace }}"
 spec:
   resources:

@@ -101,13 +101,13 @@
             fail_msg: "'business_unit' str length must be between 2 and 253 characters"
             success_msg: "'business_unit' str length value is '{{ business_unit | length }}'"
 
-        - name: "Input Validation: Assert 'cluster_name' string size >= 6 and <= 15 characters"
+        - name: "Input Validation: Assert 'ocp_primary_cluster_name' string size >= 6 and <= 15 characters"
           ansible.builtin.assert:
             that:
-              - cluster_name | length >= 6
-              - cluster_name | length <= 15
-            fail_msg: "'cluster_name' str length must be between 2 and 253 characters"
-            success_msg: "'cluster_name' str length value is '{{ cluster_name | length }}'"
+              - ocp_primary_cluster_name | length >= 6
+              - ocp_primary_cluster_name | length <= 15
+            fail_msg: "'ocp_primary_cluster_name' str length must be between 2 and 253 characters"
+            success_msg: "'ocp_primary_cluster_name' str length value is '{{ ocp_primary_cluster_name | length }}'"
 
         - name: "Input Validation: Assert 'application_name' str length >= 2 and <= 25 characters"
           ansible.builtin.assert:
