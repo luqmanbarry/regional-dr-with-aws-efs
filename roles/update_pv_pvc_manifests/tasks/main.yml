@@ -26,12 +26,6 @@
         __pv_secondary_pvc_namespaces_tmp: "{{ __pv_secondary_pvc_namespaces_tmp | default([]) | union([ item | normpath | dirname | split('/') | last ]) }}"
       with_items: 
         - "{{ __pv_secondary_manifests_paths }}"
-
-    - debug:
-        msg: "Secondary Paths: {{ __pv_secondary_manifests_paths }}\nNamespaces: {{ __pv_secondary_pvc_namespaces_tmp }}" 
-    - fail:
-        msg: "Intentionally fail"
-      when: true
       
     - name: "Update PV/PVC: Set __pv_secondary_pvc_namespaces fact"
       ansible.builtin.set_fact:
@@ -52,7 +46,7 @@
     - name: "Update PV/PVC: Copy primary PVC/PVC manifests to their secondary counterparts"
       ansible.builtin.copy:
         src: "{{ item }}"
-        dest: "{{ item | replace(pv_git_volume_root_directory, pv_git_volume_restore_root_directory) }}"
+        dest: "{{ item | replace('/primary/', '/secondary/') }}"
         # dest: "{{ item | replace('/primary/', '/secondary/')}}"
         mode: "{{ default_file_permissions }}"
       with_items:
