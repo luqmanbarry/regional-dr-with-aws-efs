@@ -17,7 +17,10 @@
 
     - name: "Update PV/PVC: Set __pv_secondary_manifests_paths fact"
       ansible.builtin.set_fact:
-        __pv_secondary_manifests_paths: "{{ __pv_secondary_manifests_paths | default([]) | union([ item | replace(pv_git_volume_root_directory, pv_git_volume_restore_root_directory) ]) }}"
+        __pv_secondary_manifests_paths: "{{ __pv_secondary_manifests_paths | default([]) | union([ item | replace('/', 'SLASH') | replace(old, new) | replace('SLASH', '/' ]) }}"
+      vars:
+        old: "{{ pv_git_volume_root_directory | replace('/', 'SLASH') }}"
+        new: "{{ pv_git_volume_restore_root_directory | replace('/', 'SLASH') }}"
       with_items: 
         - "{{ __pv_primary_manifests_paths }}"
 
