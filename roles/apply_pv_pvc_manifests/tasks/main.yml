@@ -90,10 +90,6 @@
         state: absent
         template: "{{ __mount_testPod_template }}"
         kubeconfig: "{{ kconfig }}"
-    
-    - name: "Apply PV/PVC: Sleep for 90 seconds and continue"
-      ansible.builtin.wait_for:
-        timeout: 90
 
     - name: "Apply PV/PVC: Get mount-test directory listing"
       ansible.builtin.find:
@@ -111,6 +107,8 @@
       with_items: "{{ directory_content_result.files }}" 
       loop_control:
         label: "{{ item.path }}" 
+      retries: 10
+      delay: 10
 
     - name: "Apply PV/PVC: Remove mount-test directory itself"
       ansible.builtin.file:
