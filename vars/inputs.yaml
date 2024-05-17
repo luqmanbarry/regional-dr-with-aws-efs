@@ -20,8 +20,6 @@ volume_create_strict_mode: false # True means fail if volume exists already; Fal
 # pv_enable_multi_mount: true # Set to false if you want single mount (1pod/pvc)
 # pvc_size: 10 # get-from-env
 
-ocp_login_command: "oc login --token=TOKEN --server=https://api.k8s.example.com"
-
 
 # DERIVED VARIABLES
 default_file_permissions: "u+rwx,g+rwx,o-rwx"

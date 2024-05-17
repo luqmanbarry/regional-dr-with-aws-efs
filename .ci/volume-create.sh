@@ -32,4 +32,4 @@ ansible-playbook volume-create.yaml \
   -e "pvc_name=\"$pvc_name\"" \
   -e "pvc_size=\"$pvc_size\"" \
   -e "pv_enable_multi_mount=\"$pv_enable_multi_mount\"" \
-  -v | tee volume-create.log
+  -vv | tee volume-create.log
