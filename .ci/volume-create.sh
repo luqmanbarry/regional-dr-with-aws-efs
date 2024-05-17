@@ -5,8 +5,6 @@ echo '*****************  VOLUME CREATE  **********************'
 echo '********************************************************'
 echo
 
-export ANSIBLE_ENV_DIR=".ansible-venv"
-
 # . .ci/admin-inputs.sh
 # . .ci/user-inputs.sh
 
@@ -15,7 +13,6 @@ echo '******  Launch the Ansible Virtual Environment  ********'
 echo '********************************************************'
 echo
 
-# echo ". $(pwd)/$ANSIBLE_ENV_DIR/bin/activate || echo 'Failed to enter virtual environment'"
 
 echo '********************************************************'
 echo '**********  Ansible: Initiate Volume Create  ***********'
@@ -26,8 +23,8 @@ ansible-playbook volume-create.yaml \
   -e @vars/inputs.yaml \
   -e "pv_git_commit_token=\"$pv_git_commit_token\"" \
   -e "pv_git_commit_repository=\"$pv_git_commit_repository\"" \
-  -e "ocp_login_command=\"$ocp_login_command\"" \
-  -e "src_efs_hostname=\"$src_efs_hostname\"" \
+  -e "ocp_primary_login_command=\"$ocp_primary_login_command\"" \
+  -e "efs_primary_hostname=\"$efs_primary_hostname\"" \
   -e "business_unit=\"$business_unit\"" \
   -e "cluster_name=\"$cluster_name\"" \
   -e "application_name=\"$application_name\"" \
@@ -36,5 +33,3 @@ ansible-playbook volume-create.yaml \
   -e "pvc_size=\"$pvc_size\"" \
   -e "pv_enable_multi_mount=\"$pv_enable_multi_mount\"" \
   -v | tee volume-create.log
-
-echo "deactivate || true"
