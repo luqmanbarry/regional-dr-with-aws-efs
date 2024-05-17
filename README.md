@@ -73,7 +73,7 @@ At a higher level, the procedure would look like this:
 
     The [volume-restore.yaml](./volume-restore.yaml) playbook works as follows:
 
-     - Take in required user inputs: AWS credentials, Git credentials, efs_primary_hostname, dest_efs_hostname, ocp_login_command
+     - Take in required user inputs: AWS credentials, Git credentials, efs_primary_hostname, efs_secondary_hostname, ocp_login_command
      - Stop the EFS replication and wait until EFS-Secondary is write-enabled.
      - Recursively scan the PV-PVCs directory, and list all volume manifests used for OpenShift-Primary; for each persistent-volume manifest, replace the EFS-Primary hostname with that of EFS-Secondary.
      - Apply the secondary PV/PVC manifests on OpenShit-Secondary.

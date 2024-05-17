@@ -6,7 +6,7 @@
         dest_efs_write_test_file: "{{ dest_nfs_mount_directory }}/{{ efs_volumes_root_dir }}/failover-write.test"
         efs_primary_id: "{{ efs_primary_hostname | split('.') | first }}"
 
-    - name: "Stop Replication: Stop EFS replication from '{{ efs_primary_hostname }}' to '{{ dest_efs_hostname }}'"
+    - name: "Stop Replication: Stop EFS replication from '{{ efs_primary_hostname }}' to '{{ efs_secondary_hostname }}'"
       ansible.builtin.shell: |
         aws efs delete-replication-configuration --region "{{ primary_region }}" --source-file-system-id "{{ efs_primary_id }}"
       register: stop_replication
@@ -26,7 +26,7 @@
     - name: "Stop Replication: Mount destination EFS instance to verify it is writable"
       vars:
         mount_action: "ephemeral"
-        efs_hostname: "{{ dest_efs_hostname }}"
+        efs_hostname: "{{ efs_secondary_hostname }}"
       ansible.builtin.include_role:
         name: "create_volume_folder"
         tasks_from: "efs_mount"
