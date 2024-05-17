@@ -22,7 +22,7 @@ spec:
     - sync
   nfs:
     path: "/k8s-static-volumes/sales/point-of-sale/point-of-sale/"
-    server: "fs-01db3de96fa87769b.efs.us-east-1.amazonaws.com"
+    server: "fs-089e9cc4c3d602e0f.efs.us-west-2.amazonaws.com"
     readOnly: false
   persistentVolumeReclaimPolicy: Retain
 ---
