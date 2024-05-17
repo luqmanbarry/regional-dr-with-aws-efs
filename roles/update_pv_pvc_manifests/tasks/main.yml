@@ -25,8 +25,14 @@
       ansible.builtin.set_fact:
         __pv_secondary_pvc_namespaces_tmp: "{{ __pv_secondary_pvc_namespaces_tmp | default([]) | union([ item | normpath | dirname | split('/') | last ]) }}"
       with_items: 
-        - "{{ __pv_primary_manifests_paths }}"
-    
+        - "{{ __pv_secondary_manifests_paths }}"
+
+    - debug:
+        msg: "Secondary Paths: {{ __pv_secondary_manifests_paths }}\nNamespaces: {{ __pv_secondary_pvc_namespaces_tmp }}" 
+    - fail:
+        msg: "Intentionally fail"
+      when: true
+      
     - name: "Update PV/PVC: Set __pv_secondary_pvc_namespaces fact"
       ansible.builtin.set_fact:
         __pv_secondary_pvc_namespaces: "{{ __pv_secondary_pvc_namespaces | default([]) | union([ item ]) | unique | select | list }}"
