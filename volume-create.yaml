@@ -7,22 +7,28 @@
       gather_facts: false
       volume_dr_mode: 'CREATE'
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
-      efs_hostname: "{{ src_efs_hostname }}"
+      efs_hostname: "{{ efs_primary_hostname }}"
+      ocp_login_command: "{{ ocp_primary_login_command }}"
+
     - role: create_volume_folder
       become: true
       volume_dr_mode: 'CREATE'
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
-      efs_hostname: "{{ src_efs_hostname }}"
+      efs_hostname: "{{ efs_primary_hostname }}"
+
     - role: gen_pv_pvc_manifests
       gather_facts: false
       volume_dr_mode: 'CREATE'
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
-      efs_hostname: "{{ src_efs_hostname }}"
+      efs_hostname: "{{ efs_primary_hostname }}"
+
     - role: git_commit_pv_pvc_manifests
       gather_facts: false
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
+      
     - role: apply_pv_pvc_manifests
       gather_facts: false
       volume_dr_mode: 'CREATE'
       nfs_mount_directory: "{{ src_nfs_mount_directory }}"
-      efs_hostname: "{{ src_efs_hostname }}"
+      efs_hostname: "{{ efs_primary_hostname }}"
+      ocp_login_command: "{{ ocp_primary_login_command }}"

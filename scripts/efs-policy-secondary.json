@@ -14,7 +14,7 @@
       "Resource": "*",
       "Condition": {
         "IpAddress": {
-          "aws:SourceIp": ["10.90.0.0/16", "10.91.0.0/16"]
+          "aws:SourceIp": ["10.91.0.0/16", "10.90.0.0/16"]
         }
       }
     }

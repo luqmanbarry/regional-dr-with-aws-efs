@@ -7,17 +7,22 @@
       gather_facts: false
       volume_dr_mode: 'RESTORE'
       nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
-      efs_hostname: "{{ dest_efs_hostname }}"
+      efs_hostname: "{{ efs_secondary_hostname }}"
+      ocp_login_command: "{{ ocp_secondary_login_command }}"
+
     - role: stop_efs_replication
       gather_facts: false
       volume_dr_mode: 'RESTORE'
       nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
-      efs_hostname: "{{ dest_efs_hostname }}"
+      efs_hostname: "{{ efs_secondary_hostname }}"
+
     - role: update_pv_pvc_manifests
       gather_facts: false
       volume_dr_mode: 'RESTORE'
       nfs_mount_directory: "{{ dest_nfs_mount_directory }}"
-      efs_hostname: "{{ dest_efs_hostname }}"
+      efs_hostname: "{{ efs_secondary_hostname }}"
+      ocp_login_command: "{{ ocp_secondary_login_command }}"
+      
     - role: git_commit_pv_pvc_manifests
       gather_facts: false
       nfs_mount_directory: "{{ dest_nfs_mount_directory }}"

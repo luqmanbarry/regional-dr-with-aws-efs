@@ -258,16 +258,16 @@ Since the process handles one volume (PV-PVC) provisioning per run, we'll need o
     export AWS_REGION='<value>'
 
     # EFS-Primary
-    export src_efs_hostname="fs-xxxxxxxxxxxxxxx.efs.us-east-1.amazonaws.com"
+    export efs_primary_hostname="fs-xxxxxxxxxxxxxxx.efs.us-east-1.amazonaws.com"
     # EFS-Secondary
-    export dest_efs_hostname="fs-xxxxxxxxxxxxxxx.efs.us-west-2.amazonaws.com"
+    export efs_secondary_hostname="fs-xxxxxxxxxxxxxxx.efs.us-west-2.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="<value>"
     export pv_git_commit_repository="<value>"
 
     # OpenShift-Primary Login Command
-    export ocp_login_command='oc login --token=<value> --server=<value>'
+    export ocp_primary_login_command='oc login --token=<value> --server=<value>'
 
     # BU & App & PV Info
     export business_unit="sales"
@@ -282,7 +282,12 @@ Since the process handles one volume (PV-PVC) provisioning per run, we'll need o
 2. Run the CI pipeline
 
     ```sh
+    # Load Ansible Virtual Environment
+    . .env/setup.sh
+    # Run pipeline script
     .ci/volume-create.sh
+    # Exit Ansible Virtual Environment
+    deactivate || true
     ```
 Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in the case of this demo.
 
@@ -309,14 +314,14 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    export efs_primary_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
     # OpenShift-Primary Login Command
-    export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
+    export ocp_primary_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
 
     # BU & App & PV Info
     export business_unit="sales"
@@ -361,14 +366,14 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    export efs_primary_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
     # OpenShift-Primary Login Command
-    export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
+    export ocp_primary_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
 
     # BU & App & PV Info
     export business_unit="sales"
@@ -412,14 +417,14 @@ Repeat steps `#1` and `#2` to the number of volumes you want to provision; 3 in 
     export AWS_REGION='us-east-1'
 
     # AWS EFS-Primary
-    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    export efs_primary_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
     export pv_git_commit_repository="https://github.com/luqmanbarry/regional-dr-with-aws-efs.git"
 
     # OpenShift-Primary Login Command
-    export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
+    export ocp_primary_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-primary.x1x2x.p1.openshiftapps.com:6443'
 
     # BU & App & PV Info
     export business_unit="sales"
@@ -629,9 +634,9 @@ As the failover will take place in the secondary region (`us-west-2`), in a diff
     export AWS_REGION='us-east-1'
 
     # EFS-Primary
-    export src_efs_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
+    export efs_primary_hostname="fs-05f6bf826e1775f20.efs.us-east-1.amazonaws.com"
     # EFS-Secondary
-    export dest_efs_hostname="fs-0e420f11e0641a5c3.efs.us-west-2.amazonaws.com"
+    export efs_secondary_hostname="fs-0e420f11e0641a5c3.efs.us-west-2.amazonaws.com"
 
     ## Git Repository
     export pv_git_commit_token="github_pat_88888888PQ0xYEukOhVw9U9_k111111tkHKE5Gg8CaDqPH2EVFCEv000000eKEnytDv6U6KNX2NSrtKvJkv"
@@ -640,13 +645,18 @@ As the failover will take place in the secondary region (`us-west-2`), in a diff
     # Restore From Cluster Name
     export cluster_name="rosa-primary"
     # OpenShift-Secondary Login Command
-    export ocp_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-secondary.x1x2x.p1.openshiftapps.com:6443'
+    export ocp_secondary_login_command='oc login --token=sha256~bWHzY9YGoSDH4Xj0123456789du3mh0xQv4IsvEEAsU --server=https://api.rosa-secondary.x1x2x.p1.openshiftapps.com:6443'
     ```
 
 3. Run the volume restore job
 
     ```sh
+    # Load Ansible Virtual Environment
+    . .env/setup.sh
+    # Run pipeline script
     .ci/volume-restore.sh
+    # Exit Ansible Virtual Environment
+    deactivate || true
     ```
 
 
