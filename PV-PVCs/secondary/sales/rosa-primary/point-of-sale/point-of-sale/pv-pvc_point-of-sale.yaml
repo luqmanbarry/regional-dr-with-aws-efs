@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "sales.point-of-sale.point-of-sale.point-of-sale"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-point-of-sale"
+spec:
+  capacity:
+    storage: "100Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: ""
+  mountOptions:
+    - nfsvers=4.1
+    - hard
+    - rw
+    - sync
+  nfs:
+    path: "/k8s-static-volumes/sales/point-of-sale/point-of-sale/"
+    server: "fs-089e9cc4c3d602e0f.efs.us-west-2.amazonaws.com"
+    readOnly: false
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "point-of-sale"
+  labels:
+    "volume-provision/type": "static"
+    "volume-provision/user": "ansible-automation"
+    "volume-provision/owner": "sales-rosa-primary-point-of-sale"
+  namespace: "point-of-sale"
+spec:
+  resources:
+    requests:
+      storage: "100Gi"
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: "sales.point-of-sale.point-of-sale.point-of-sale"
