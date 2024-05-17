@@ -36,8 +36,8 @@
         git status
         git fetch
         git pull
-        git add .
-        git commit -am {{ commit_message }}
+        git add -A
+        git commit -am "{{ commit_message }}"
         git push {{ git_remote_name }} {{ git_branch }}
       args:
         chdir: "{{ pv_git_commit_dir }}"
