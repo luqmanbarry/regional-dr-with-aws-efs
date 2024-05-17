@@ -2,6 +2,7 @@
 
 > [!NOTE]
 > AWS EFS does not support cross-account replication. To solve this use case, you would need to rely on EFS Backups or DataSync.
+> Amazon EFS maintains a Recovery Point Objective (RPO) of 15 minutes for most file systems. Read [this](https://docs.aws.amazon.com/efs/latest/ug/replication-use-cases.html#efs-replication-performance) article to get the most recent information.
 
 Two regions, primary (`us-east-1`) and secondary (`us-west-2`) are used for the demonstration. 
 

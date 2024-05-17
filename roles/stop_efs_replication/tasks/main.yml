@@ -4,11 +4,11 @@
     - name: "Stop Replication: Set facts"
       ansible.builtin.set_fact:
         dest_efs_write_test_file: "{{ dest_nfs_mount_directory }}/{{ efs_volumes_root_dir }}/failover-write.test"
-        src_efs_id: "{{ src_efs_hostname | split('.') | first }}"
+        efs_primary_id: "{{ efs_primary_hostname | split('.') | first }}"
 
-    - name: "Stop Replication: Stop EFS replication from '{{ src_efs_hostname }}' to '{{ dest_efs_hostname }}'"
+    - name: "Stop Replication: Stop EFS replication from '{{ efs_primary_hostname }}' to '{{ dest_efs_hostname }}'"
       ansible.builtin.shell: |
-        aws efs delete-replication-configuration --region "{{ primary_region }}" --source-file-system-id "{{ src_efs_id }}"
+        aws efs delete-replication-configuration --region "{{ primary_region }}" --source-file-system-id "{{ efs_primary_id }}"
       register: stop_replication
       failed_when: false
 

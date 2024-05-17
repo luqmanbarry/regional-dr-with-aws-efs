@@ -61,7 +61,7 @@ At a higher level, the procedure would look like this:
 7. Implement the automation process (ie: Ansible...etc) for tenants (app teams) to request static persistent volumes on OpenShift-Primary.
 
     The [volume-create.yaml](./volume-create.yaml) playbook works as follows:
-    - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, business_unit, ocp_primary_cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
+    - Take in required user inputs: AWS credentials, Git credentials, efs_primary_hostname, business_unit, ocp_primary_cluster_name, application_name, pvc_name, pvc_size, namespace, ocp_login_command
     - Validate user inputs for character lengths, OpenShift cluster-admin permission, ...etc.
     - Create the volume directory tree as: `/<prefix>/<business_unit>/<ocp_primary_cluster_name>/<application_name>/<namespace>/<pvc_name>`.
     - Using the predefined PV/PVC template, replace parameters such as <volume_name>, <volume_namespace>, <volume_nfs_server>, <volume_nfs_path>, and save the output manifest to a directory local to the repository.
@@ -73,7 +73,7 @@ At a higher level, the procedure would look like this:
 
     The [volume-restore.yaml](./volume-restore.yaml) playbook works as follows:
 
-     - Take in required user inputs: AWS credentials, Git credentials, src_efs_hostname, dest_efs_hostname, ocp_login_command
+     - Take in required user inputs: AWS credentials, Git credentials, efs_primary_hostname, dest_efs_hostname, ocp_login_command
      - Stop the EFS replication and wait until EFS-Secondary is write-enabled.
      - Recursively scan the PV-PVCs directory, and list all volume manifests used for OpenShift-Primary; for each persistent-volume manifest, replace the EFS-Primary hostname with that of EFS-Secondary.
      - Apply the secondary PV/PVC manifests on OpenShit-Secondary.
