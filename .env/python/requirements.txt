@@ -1,0 +1,8 @@
+ansible
+kubernetes
+jsonpatch
+pyyaml
+jmespath
+kubernetes-validate
+openshift
+openshift-client

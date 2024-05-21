@@ -32,21 +32,16 @@ then
   deactivate || echo "Ansible Virtual Environment not active"
   . ${ANSIBLE_ENV_DIR}/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
 
-  pip3.11 install -U \
-    ansible \
-    kubernetes \
-    jsonpatch \
-    pyyaml \
-    jmespath \
-    kubernetes-validate \
-    openshift \
-    openshift-client
+  echo "=====> Installing python packages..."
+  pip3.11 install -U -r .env/python/requirements.txt
     
   pip3.11 list
 
   ansible --version
 
-  ansible-galaxy collection install -r .env/requirements.yaml
+  echo "######> Installing Ansible collections..."
+  ansible-galaxy collection install -r .env/ansible/requirements.yaml
+  
 
 fi
 
