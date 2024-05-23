@@ -29,8 +29,8 @@ then
   echo "Current Directory: $(pwd)"
   echo "Current Directory Content: $(ls -latr)"
 
-  deactivate || echo "Ansible Virtual Environment not active"
-  . ${ANSIBLE_ENV_DIR}/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
+  deactivate || (true && echo "Ansible Virtual Environment not active")
+  . ${ANSIBLE_ENV_DIR}/bin/activate || (false && echo 'Failed to enter Ansible Virtual Environment')
 
   echo "=====> Installing python packages..."
   pip3.11 install -U -r .env/python/requirements.txt
@@ -45,5 +45,5 @@ then
 
 fi
 
-deactivate || echo "Ansible Virtual Environment not active"
-. ${ANSIBLE_ENV_DIR}/bin/activate || echo 'Failed to enter Ansible Virtual Environment'
+deactivate || (true && echo "Ansible Virtual Environment not active")
+. ${ANSIBLE_ENV_DIR}/bin/activate || (false && echo 'Failed to enter Ansible Virtual Environment')
