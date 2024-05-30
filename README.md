@@ -1,4 +1,4 @@
-# AWS disaster recovery with Red Hat OpenShift and Amazon Elastic File System - An unpopular yet effective approach
+# Disaster recovery with Red Hat OpenShift and Amazon Elastic File System - An unpopular yet effective approach
 
 
 ## Introduction
